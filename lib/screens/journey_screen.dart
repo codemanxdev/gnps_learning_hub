@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../models/journey.dart';
 import '../models/lesson.dart';
+import '../models/progress.dart';
 import '../providers.dart';
+import '../widgets/journey/lesson_path.dart';
+import '../widgets/journey/journey_banner.dart';
 import 'lesson_screen.dart';
 import 'profile_screen.dart';
 
@@ -16,98 +20,89 @@ class JourneyScreen extends ConsumerStatefulWidget {
 class _JourneyScreenState extends ConsumerState<JourneyScreen> {
   int _tabIndex = 0;
 
+  Future<void> _openLesson(Lesson lesson, Journey journey) async {
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => LessonScreen(lesson: lesson, journey: journey),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final journeyAsync = ref.watch(journeyProvider);
     final progressAsync = ref.watch(progressProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Your Journey')),
-      body: IndexedStack(
-        index: _tabIndex,
-        children: [
-          journeyAsync.when(
-            data: (journey) => progressAsync.when(
-              data: (progress) => _LessonPath(
-                lessons: journey.lessons,
-                unlockedIds: progress.unlockedLessonIds,
-                completedIds: progress.completedLessonIds,
+      body: SafeArea(
+        bottom: false, // NavigationBar handles the bottom inset itself
+        child: IndexedStack(
+          index: _tabIndex,
+          children: [
+            journeyAsync.when(
+              data: (journey) => progressAsync.when(
+                data: (progress) => _JourneyContent(
+                  journey: journey,
+                  progress: progress,
+                  onTapLesson: (lesson) => _openLesson(lesson, journey),
+                ),
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (e, _) =>
+                    Center(child: Text('Error loading progress: $e')),
               ),
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, _) => Center(child: Text('Error loading progress: $e')),
+              error: (e, _) => Center(child: Text('Error loading lessons: $e')),
             ),
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (e, _) => Center(child: Text('Error loading lessons: $e')),
-          ),
-          const ProfileScreen(),
-        ],
+            const ProfileScreen(),
+          ],
+        ),
       ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _tabIndex,
         onDestinationSelected: (i) => setState(() => _tabIndex = i),
         destinations: const [
-          NavigationDestination(icon: Icon(Icons.map_outlined), label: 'Journey'),
-          NavigationDestination(icon: Icon(Icons.person_outline), label: 'Profile'),
+          NavigationDestination(
+            icon: Icon(Icons.map_outlined),
+            label: 'Journey',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.person_outline),
+            label: 'Profile',
+          ),
         ],
       ),
     );
   }
 }
 
-class _LessonPath extends ConsumerWidget {
-  final List<Lesson> lessons;
-  final Set<String> unlockedIds;
-  final Set<String> completedIds;
+class _JourneyContent extends StatelessWidget {
+  final Journey journey;
+  final LocalProgress progress;
+  final void Function(Lesson lesson) onTapLesson;
 
-  const _LessonPath({
-    required this.lessons,
-    required this.unlockedIds,
-    required this.completedIds,
+  const _JourneyContent({
+    required this.journey,
+    required this.progress,
+    required this.onTapLesson,
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return ListView.separated(
-      padding: const EdgeInsets.all(16),
-      itemCount: lessons.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 12),
-      itemBuilder: (context, index) {
-        final lesson = lessons[index];
-        final isUnlocked = unlockedIds.contains(lesson.id);
-        final isCompleted = completedIds.contains(lesson.id);
-
-        return Card(
-          elevation: isUnlocked ? 2 : 0,
-          color: isUnlocked ? null : Theme.of(context).colorScheme.surfaceContainerHighest,
-          child: ListTile(
-            leading: CircleAvatar(
-              backgroundColor: isCompleted
-                  ? Colors.green
-                  : (isUnlocked ? Theme.of(context).colorScheme.primary : Colors.grey),
-              child: Icon(
-                isCompleted
-                    ? Icons.check
-                    : (isUnlocked ? Icons.play_arrow : Icons.lock_outline),
-                color: Colors.white,
-              ),
-            ),
-            title: Text(lesson.title),
-            subtitle: Text('${lesson.tasks.length} activities'),
-            enabled: isUnlocked,
-            onTap: isUnlocked
-                ? () async {
-                    final journey = await ref.read(journeyProvider.future);
-                    if (!context.mounted) return;
-                    await Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => LessonScreen(lesson: lesson, journey: journey),
-                      ),
-                    );
-                  }
-                : null,
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        JourneyBanner(
+          streak: progress.currentStreak,
+          points: progress.totalPoints,
+        ),
+        Expanded(
+          child: LessonPath(
+            lessons: journey.lessons,
+            unlockedIds: progress.unlockedLessonIds,
+            completedIds: progress.completedLessonIds,
+            onTapLesson: onTapLesson,
           ),
-        );
-      },
+        ),
+      ],
     );
   }
 }

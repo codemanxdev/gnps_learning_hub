@@ -36,9 +36,13 @@ class ProgressService {
   }
 
   /// Ensures the first lesson is unlocked on a fresh install.
-  LocalProgress ensureFirstLessonUnlocked(LocalProgress progress, Journey journey) {
+  Future<LocalProgress> ensureFirstLessonUnlocked(
+    LocalProgress progress,
+    Journey journey,
+  ) async {
     if (progress.unlockedLessonIds.isEmpty && journey.lessons.isNotEmpty) {
       progress.unlockedLessonIds.add(journey.lessons.first.id);
+      await _repository.save(progress);
     }
     return progress;
   }

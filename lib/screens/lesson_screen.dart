@@ -5,6 +5,7 @@ import '../models/journey.dart';
 import '../models/lesson.dart';
 import '../models/task.dart';
 import '../providers.dart';
+import '../widgets/journey/current_lesson_banner.dart';
 import '../widgets/tasks/arrange_sentence_task_widget.dart';
 import '../widgets/tasks/fill_in_blank_task_widget.dart';
 import '../widgets/tasks/spelling_task_widget.dart';
@@ -31,11 +32,9 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
     if (_taskIndex + 1 < widget.lesson.tasks.length) {
       setState(() => _taskIndex++);
     } else {
-      await ref.read(progressProvider.notifier).completeLesson(
-            widget.journey,
-            widget.lesson.id,
-            _pointsEarned,
-          );
+      await ref
+          .read(progressProvider.notifier)
+          .completeLesson(widget.journey, widget.lesson.id, _pointsEarned);
       if (mounted) _showCompletionDialog();
     }
   }
@@ -63,33 +62,63 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
   Widget _buildTask(Task task) {
     switch (task.type) {
       case TaskType.trace:
-        return TraceTaskWidget(task: task, onComplete: () => _onTaskComplete(task));
+        return TraceTaskWidget(
+          task: task,
+          onComplete: () => _onTaskComplete(task),
+        );
       case TaskType.spelling:
-        return SpellingTaskWidget(task: task, onComplete: () => _onTaskComplete(task));
+        return SpellingTaskWidget(
+          task: task,
+          onComplete: () => _onTaskComplete(task),
+        );
       case TaskType.wordSelection:
-        return WordSelectionTaskWidget(task: task, onComplete: () => _onTaskComplete(task));
+        return WordSelectionTaskWidget(
+          task: task,
+          onComplete: () => _onTaskComplete(task),
+        );
       case TaskType.arrangeSentence:
-        return ArrangeSentenceTaskWidget(task: task, onComplete: () => _onTaskComplete(task));
+        return ArrangeSentenceTaskWidget(
+          task: task,
+          onComplete: () => _onTaskComplete(task),
+        );
       case TaskType.fillInBlank:
-        return FillInBlankTaskWidget(task: task, onComplete: () => _onTaskComplete(task));
+        return FillInBlankTaskWidget(
+          task: task,
+          onComplete: () => _onTaskComplete(task),
+        );
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final task = widget.lesson.tasks[_taskIndex];
-    final progressFraction = (_taskIndex) / widget.lesson.tasks.length;
+    final progressAsync = ref.watch(progressProvider);
 
     return Scaffold(
-      appBar: AppBar(title: Text(widget.lesson.title)),
-      body: Column(
-        children: [
-          LinearProgressIndicator(value: progressFraction),
-          Expanded(
-            // Keying by task.id ensures each task widget rebuilds fresh state.
-            child: KeyedSubtree(key: ValueKey(task.id), child: _buildTask(task)),
-          ),
-        ],
+      body: SafeArea(
+        bottom: false,
+        child: Column(
+          children: [
+            progressAsync.when(
+              data: (progress) => CurrentLessonBanner(
+                lessonTitle: widget.lesson.title,
+                taskIndex: _taskIndex,
+                totalTasks: widget.lesson.tasks.length,
+                streak: progress.currentStreak,
+                points: progress.totalPoints,
+                onBack: () => Navigator.of(context).pop(),
+              ),
+              loading: () => const SizedBox.shrink(),
+              error: (_, __) => const SizedBox.shrink(),
+            ),
+            Expanded(
+              child: KeyedSubtree(
+                key: ValueKey(task.id),
+                child: _buildTask(task),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

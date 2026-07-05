@@ -15,22 +15,19 @@ final progressServiceProvider = Provider((ref) {
   return ProgressService(ref.read(progressRepositoryProvider));
 });
 
-/// Loaded once at splash time: checks Firestore for updates, falls back to
-/// local/mock content on failure. See ContentRepository for details.
 final journeyProvider = FutureProvider<Journey>((ref) async {
   final repo = ref.read(contentRepositoryProvider);
   return repo.checkForUpdatesAndSync();
 });
 
-/// Holds the user's local progress and exposes mutation methods used
-/// throughout the app (completing lessons, registering app opens).
 class ProgressNotifier extends StateNotifier<AsyncValue<LocalProgress>> {
   final ProgressRepository _repository;
   final ProgressService _service;
+  late final Future<void> _initialLoad;
 
   ProgressNotifier(this._repository, this._service)
-      : super(const AsyncValue.loading()) {
-    _load();
+    : super(const AsyncValue.loading()) {
+    _initialLoad = _load();
   }
 
   Future<void> _load() async {
@@ -39,20 +36,27 @@ class ProgressNotifier extends StateNotifier<AsyncValue<LocalProgress>> {
   }
 
   Future<void> registerAppOpen() async {
+    await _initialLoad; // wait for Hive to actually finish loading
     final current = state.value;
     if (current == null) return;
     final updated = await _service.registerAppOpen(current);
     state = AsyncValue.data(updated);
   }
 
-  void ensureFirstLessonUnlocked(Journey journey) {
+  Future<void> ensureFirstLessonUnlocked(Journey journey) async {
+    await _initialLoad; // wait for Hive to actually finish loading
     final current = state.value;
     if (current == null) return;
-    final updated = _service.ensureFirstLessonUnlocked(current, journey);
+    final updated = await _service.ensureFirstLessonUnlocked(current, journey);
     state = AsyncValue.data(updated);
   }
 
-  Future<void> completeLesson(Journey journey, String lessonId, int points) async {
+  Future<void> completeLesson(
+    Journey journey,
+    String lessonId,
+    int points,
+  ) async {
+    await _initialLoad;
     final current = state.value;
     if (current == null) return;
     final updated = await _service.completeLesson(
@@ -67,8 +71,8 @@ class ProgressNotifier extends StateNotifier<AsyncValue<LocalProgress>> {
 
 final progressProvider =
     StateNotifierProvider<ProgressNotifier, AsyncValue<LocalProgress>>((ref) {
-  return ProgressNotifier(
-    ref.read(progressRepositoryProvider),
-    ref.read(progressServiceProvider),
-  );
-});
+      return ProgressNotifier(
+        ref.read(progressRepositoryProvider),
+        ref.read(progressServiceProvider),
+      );
+    });

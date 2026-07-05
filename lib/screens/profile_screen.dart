@@ -11,38 +11,46 @@ class ProfileScreen extends ConsumerWidget {
     final progressAsync = ref.watch(progressProvider);
 
     return progressAsync.when(
-      data: (progress) => Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: _StatCard(
-                    icon: Icons.local_fire_department,
-                    color: Colors.orange,
-                    label: 'Streak',
-                    value: '${progress.currentStreak} day${progress.currentStreak == 1 ? '' : 's'}',
+      data: (progress) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                'Profile',
+                style: Theme.of(context).textTheme.headlineMedium,
+              ),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  Expanded(
+                    child: _StatCard(
+                      icon: Icons.local_fire_department,
+                      color: Colors.orange,
+                      label: 'Streak',
+                      value:
+                          '${progress.currentStreak} day${progress.currentStreak == 1 ? '' : 's'}',
+                    ),
                   ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: _StatCard(
-                    icon: Icons.star,
-                    color: Colors.amber,
-                    label: 'Points',
-                    value: '${progress.totalPoints}',
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: _StatCard(
+                      icon: Icons.star,
+                      color: Colors.amber,
+                      label: 'Points',
+                      value: '${progress.totalPoints}',
+                    ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
-            Text(
-              'Lessons completed: ${progress.completedLessonIds.length}',
-              style: Theme.of(context).textTheme.bodyLarge,
-            ),
-          ],
+                ],
+              ),
+              const SizedBox(height: 24),
+              Text(
+                'Lessons completed: ${progress.completedLessonIds.length}',
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
+            ],
+          ),
         ),
       ),
       loading: () => const Center(child: CircularProgressIndicator()),

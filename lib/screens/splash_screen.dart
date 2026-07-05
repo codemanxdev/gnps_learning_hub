@@ -26,7 +26,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     await ref.read(progressProvider.notifier).registerAppOpen();
 
     final journey = await journeyFuture;
-    ref.read(progressProvider.notifier).ensureFirstLessonUnlocked(journey);
+    await ref.read(progressProvider.notifier).ensureFirstLessonUnlocked(journey);
 
     await minimumSplashTime;
 
