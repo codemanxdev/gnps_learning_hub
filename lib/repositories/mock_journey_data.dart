@@ -272,35 +272,9 @@ final Journey mockJourney = Journey.fromJson({
       ],
     },
     {
-      'id': 'lesson_001',
-      'title': 'Greetings',
-      'order': 8,
-      'tasks': [
-        {
-          'id': 't1',
-          'type': 'trace',
-          'pointsAwarded': 10,
-          'content': {'letter': 'ਸ', 'transliteration': 'sa'},
-        },
-        {
-          'id': 't2',
-          'type': 'wordSelection',
-          'pointsAwarded': 10,
-          'content': {
-            'word': 'ਕੁੱਤਾ',
-            'correctImageUrl': 'assets/images/dog.png',
-            'distractorImageUrls': [
-              'assets/images/cat.png',
-              'assets/images/bird.png',
-            ],
-          },
-        },
-      ],
-    },
-    {
       'id': 'lesson_002',
       'title': 'Animals',
-      'order': 9,
+      'order': 8,
       'tasks': [
         {
           'id': 't3',
@@ -327,7 +301,7 @@ final Journey mockJourney = Journey.fromJson({
     {
       'id': 'lesson_003',
       'title': 'Simple Sentences',
-      'order': 10,
+      'order': 9,
       'tasks': [
         {
           'id': 't5',

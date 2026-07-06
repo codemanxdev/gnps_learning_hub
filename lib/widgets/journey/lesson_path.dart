@@ -2,10 +2,12 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 import '../../models/lesson.dart';
-import 'bobbing_butterfly.dart';
-import 'dashed_path_painter.dart';
-import 'floating_leaf.dart';
+import './props/flying_butterfly.dart';
+import './props/firefly_sparkle.dart';
+import './props/floating_leaf.dart';
+import './props/flying_bird.dart';
 import 'forest_background_painter.dart';
+import './props/hopping_squirrel.dart';
 import 'lesson_node.dart';
 
 class LessonPath extends StatelessWidget {
@@ -17,8 +19,7 @@ class LessonPath extends StatelessWidget {
   static const double _verticalSpacing = 150;
   static const double _nodeSize = 76;
   static const double _horizontalAmplitude = 90;
-  static const double _topPadding =
-      70; // room for the START bubble above the first node
+  static const double _topPadding = 70;
 
   const LessonPath({
     super.key,
@@ -50,32 +51,121 @@ class LessonPath extends StatelessWidget {
     return centerX + wave * _horizontalAmplitude;
   }
 
-  /// Scatters a leaf/butterfly between each consecutive pair of nodes,
-  /// alternating sides of the path so they read as part of the scenery
-  /// rather than clutter directly on top of the trail.
-  List<Widget> _buildDecorations(List<Offset> nodeCenters, double centerX) {
-    final decorations = <Widget>[];
-    for (int i = 0; i < nodeCenters.length - 1; i++) {
-      final midY = (nodeCenters[i].dy + nodeCenters[i + 1].dy) / 2;
-      final side = i.isEven ? -1 : 1;
-      final x = centerX + side * (150 + 20 * (i % 3));
+  List<Widget> _buildExtraLeaves(List<Offset> nodeCenters, double centerX) {
+    final leaves = <Widget>[];
+    final random = Random(41);
 
-      final isLeaf = i.isEven;
-      decorations.add(
+    for (int i = 0; i < nodeCenters.length - 1; i++) {
+      final segmentTop = nodeCenters[i].dy;
+      final segmentBottom = nodeCenters[i + 1].dy;
+
+      for (int j = 0; j < 3; j++) {
+        final y =
+            segmentTop + (segmentBottom - segmentTop) * random.nextDouble();
+        final side = random.nextBool() ? -1 : 1;
+        final x = centerX + side * (60 + random.nextDouble() * 160);
+
+        leaves.add(
+          Positioned(
+            left: x,
+            top: y,
+            child: FloatingLeaf(
+              size: 16 + random.nextDouble() * 10,
+              period: Duration(milliseconds: 2200 + random.nextInt(1600)),
+            ),
+          ),
+        );
+      }
+    }
+    return leaves;
+  }
+
+  List<Widget> _buildCreatures(List<Offset> nodeCenters, double centerX) {
+    final decorations = <Widget>[];
+    // No fixed seed: spawn positions now vary between app loads/rebuilds
+    // instead of always landing in the exact same spots.
+    final random = Random();
+
+    for (int i = 0; i < nodeCenters.length - 1; i++) {
+      final segmentTop = nodeCenters[i].dy;
+      final segmentBottom = nodeCenters[i + 1].dy;
+
+      for (int j = 0; j < 2; j++) {
+        final y =
+            segmentTop +
+            (segmentBottom - segmentTop) * (0.15 + random.nextDouble() * 0.6);
+        final side = random.nextBool() ? -1 : 1;
+
+        // Default starting X for other props
+        double x = centerX + side * (140 + random.nextDouble() * 60);
+
+        final creatureIndex = (i * 2 + j) % 4;
+        Widget creature;
+
+        switch (creatureIndex) {
+          case 0:
+            creature = FloatingLeaf(
+              period: Duration(milliseconds: 2600 + (i % 3) * 400),
+            );
+            break;
+
+          case 1:
+            // Spawn positions relative to map center
+            if (side == 1) {
+              x = centerX + 40 + random.nextDouble() * 20;
+            } else {
+              x = centerX - 120 - random.nextDouble() * 20;
+            }
+
+            const butterflySize = 2.0; // Tiny, elegant forest butterfly scale
+            creature = SizedBox(
+              width: butterflySize * 1.6,
+              height: butterflySize,
+              child: FlyingButterfly(
+                travelWidth: 50,
+                size: butterflySize,
+                flyLeft:
+                    side ==
+                    1, // Instantly mirrors flight vector & paths properly
+              ),
+            );
+            break;
+
+          case 2:
+            creature = HoppingSquirrel(
+              period: Duration(milliseconds: 1200 + (i % 3) * 300),
+            );
+            break;
+
+          default:
+            creature = FireflySparkle(
+              period: Duration(milliseconds: 1800 + (i % 3) * 400),
+            );
+        }
+
+        decorations.add(Positioned(left: x, top: y, child: creature));
+      }
+    }
+    return decorations;
+  }
+
+  List<Widget> _buildBirds(double totalHeight, double totalWidth) {
+    final birds = <Widget>[];
+    final birdCount = max(1, (totalHeight / 500).floor());
+    for (int i = 0; i < birdCount; i++) {
+      final y = totalHeight * (i + 0.5) / birdCount;
+      birds.add(
         Positioned(
-          left: x,
-          top: midY,
-          child: isLeaf
-              ? FloatingLeaf(
-                  period: Duration(milliseconds: 2600 + (i % 3) * 400),
-                )
-              : BobbingButterfly(
-                  period: Duration(milliseconds: 3400 + (i % 4) * 300),
-                ),
+          left: -40,
+          top: y,
+          child: FlyingBird(
+            travelWidth: totalWidth + 80,
+            period: Duration(seconds: 9 + i * 2),
+          ),
         ),
       );
     }
-    return decorations;
+    return birds;
   }
 
   @override
@@ -84,7 +174,7 @@ class LessonPath extends StatelessWidget {
       builder: (context, constraints) {
         final centerX = constraints.maxWidth / 2;
         final totalHeight =
-            _verticalSpacing * lessons.length + _nodeSize + _topPadding + 20;
+            _verticalSpacing * lessons.length + _nodeSize + _topPadding + 68;
 
         final nodeCenters = [
           for (int i = 0; i < lessons.length; i++)
@@ -95,12 +185,12 @@ class LessonPath extends StatelessWidget {
         ];
 
         return SingleChildScrollView(
-          padding: const EdgeInsets.only(bottom: 48),
           child: SizedBox(
             width: constraints.maxWidth,
             height: totalHeight,
             child: Stack(
               clipBehavior: Clip.none,
+              // Ensures layout elements glide naturally offscreen
               children: [
                 Positioned.fill(
                   child: CustomPaint(
@@ -110,15 +200,9 @@ class LessonPath extends StatelessWidget {
                     ),
                   ),
                 ),
-                Positioned.fill(
-                  child: CustomPaint(
-                    painter: DashedPathPainter(
-                      points: nodeCenters,
-                      color: Colors.white.withValues(alpha: 0.8),
-                    ),
-                  ),
-                ),
-                ..._buildDecorations(nodeCenters, centerX),
+                ..._buildCreatures(nodeCenters, centerX),
+                ..._buildExtraLeaves(nodeCenters, centerX),
+                ..._buildBirds(totalHeight, constraints.maxWidth),
                 for (int i = 0; i < lessons.length; i++)
                   Positioned(
                     left: nodeCenters[i].dx - (_nodeSize + 24) / 2,
