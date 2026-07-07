@@ -54,8 +54,9 @@ class _WordSelectionTaskWidgetState extends ConsumerState<WordSelectionTaskWidge
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(word, style: Theme.of(context).textTheme.displaySmall),
               TaskSpeakerButton(textToSpeak: word),
+              const SizedBox(width: 12),
+              Text(word, style: Theme.of(context).textTheme.displaySmall),
             ],
           ),
           const SizedBox(height: 24),

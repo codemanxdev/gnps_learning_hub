@@ -1,6 +1,7 @@
+import 'package:flutter/services.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 
-/// Speaks Punjabi (Gurmukhi) text aloud.
+/// Speaks Punjabi (Gurmukhi) text aloud and plays feedback sounds.
 ///
 /// Android: uses Google's TTS engine which supports Punjabi (India) natively.
 /// iOS: AVSpeechSynthesizer does not reliably support Punjabi — this is a
@@ -34,5 +35,11 @@ class AudioService {
 
   Future<void> stop() async {
     await _tts.stop();
+  }
+
+  /// Plays a short 'tick' sound for successful actions.
+  Future<void> playSuccess() async {
+    await SystemSound.play(SystemSoundType.click);
+    await HapticFeedback.lightImpact();
   }
 }

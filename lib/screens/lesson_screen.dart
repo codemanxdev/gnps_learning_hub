@@ -25,9 +25,22 @@ class LessonScreen extends ConsumerStatefulWidget {
 class _LessonScreenState extends ConsumerState<LessonScreen> {
   int _taskIndex = 0;
   int _pointsEarned = 0;
+  bool _showingSuccess = false;
 
   void _onTaskComplete(Task task) async {
     _pointsEarned += task.pointsAwarded;
+    
+    // Play success sound
+    ref.read(audioServiceProvider).playSuccess();
+
+    // Show success feedback
+    setState(() => _showingSuccess = true);
+    
+    // Wait for feedback to be visible
+    await Future.delayed(const Duration(milliseconds: 1200));
+
+    if (!mounted) return;
+    setState(() => _showingSuccess = false);
 
     if (_taskIndex + 1 < widget.lesson.tasks.length) {
       setState(() => _taskIndex++);
@@ -112,9 +125,51 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
               error: (_, _) => const SizedBox.shrink(),
             ),
             Expanded(
-              child: KeyedSubtree(
-                key: ValueKey(task.id),
-                child: _buildTask(task),
+              child: Stack(
+                children: [
+                  KeyedSubtree(
+                    key: ValueKey(task.id),
+                    child: _buildTask(task),
+                  ),
+                  if (_showingSuccess)
+                    Container(
+                      color: Colors.white.withValues(alpha: 0.8),
+                      child: Center(
+                        child: TweenAnimationBuilder<double>(
+                          tween: Tween(begin: 0.0, end: 1.0),
+                          duration: const Duration(milliseconds: 500),
+                          curve: Curves.elasticOut,
+                          builder: (context, value, child) {
+                            return Transform.scale(
+                              scale: value,
+                              child: child,
+                            );
+                          },
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(
+                                Icons.check_circle,
+                                color: Colors.green,
+                                size: 120,
+                              ),
+                              const SizedBox(height: 16),
+                              Text(
+                                'Correct!',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .displaySmall
+                                    ?.copyWith(
+                                      color: Colors.green,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
               ),
             ),
           ],

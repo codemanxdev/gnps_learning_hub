@@ -89,8 +89,9 @@ class _ArrangeSentenceTaskWidgetState extends ConsumerState<ArrangeSentenceTaskW
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const TaskHeader(title: 'Arrange the sentence'),
               TaskSpeakerButton(textToSpeak: fullSentence),
+              const SizedBox(width: 12),
+              const TaskHeader(title: 'Arrange the sentence'),
             ],
           ),
           const SizedBox(height: 24),

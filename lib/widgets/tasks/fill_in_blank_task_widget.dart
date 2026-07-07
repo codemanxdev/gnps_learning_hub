@@ -47,15 +47,16 @@ class _FillInBlankTaskWidgetState extends ConsumerState<FillInBlankTaskWidget> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              TaskSpeakerButton(
+                textToSpeak: parts.map((p) => p == '___' ? correctWord : p).join(' '),
+              ),
+              const SizedBox(width: 12),
               Flexible(
                 child: Text(
                   displaySentence,
                   style: Theme.of(context).textTheme.headlineSmall,
                   textAlign: TextAlign.center,
                 ),
-              ),
-              TaskSpeakerButton(
-                textToSpeak: parts.map((p) => p == '___' ? correctWord : p).join(' '),
               ),
             ],
           ),
