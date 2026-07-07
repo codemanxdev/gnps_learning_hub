@@ -334,6 +334,16 @@ final Journey mockJourney = Journey.fromJson({
             'letterBank': ['ਕੁ', 'ੱ', 'ਤਾ', 'ਬ', 'ਲੀ'],
           },
         },
+        {
+          'id': 't9',
+          'type': 'spelling',
+          'pointsAwarded': 15,
+          'content': {
+            'imageUrl': 'assets/images/book.png',
+            'targetWord': 'ਕਿਤਾਬ',
+            'letterBank': ['ਕਿ', 'ਤਾ', 'ਬ', 'ਮੇਰੀ', 'ਸਕੂਲ'],
+          },
+        },
       ],
     },
     {
@@ -396,16 +406,6 @@ final Journey mockJourney = Journey.fromJson({
           'content': {
             'words': ['ਇਹ', 'ਮੇਰੀ', 'ਕਿਤਾਬ', 'ਹੈ'],
             'correctOrder': [0, 1, 2, 3],
-          },
-        },
-        {
-          'id': 't9',
-          'type': 'spelling',
-          'pointsAwarded': 15,
-          'content': {
-            'imageUrl': 'assets/images/book.png',
-            'targetWord': 'ਕਿਤਾਬ',
-            'letterBank': ['ਕਿ', 'ਤਾ', 'ਬ', 'ਮੇਰੀ', 'ਸਕੂਲ'],
           },
         },
       ],
