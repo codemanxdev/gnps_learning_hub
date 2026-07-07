@@ -6,7 +6,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../models/task.dart';
-import '../../providers.dart';
+import '../common/task_speaker_button.dart';
+import '../common/task_done_button.dart';
+import '../common/task_clear_button.dart';
+import '../common/task_header.dart';
 
 /// Lets the child trace a letter over a guide.
 ///
@@ -206,18 +209,12 @@ class _TraceTaskWidgetState extends ConsumerState<TraceTaskWidget> {
       padding: const EdgeInsets.all(24),
       child: Column(
         children: [
-          Text(
-            'Trace the letter',
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
+          const TaskHeader(title: 'Trace the letter'),
           const SizedBox(height: 8),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              IconButton(
-                icon: const Icon(Icons.volume_up),
-                onPressed: () => ref.read(audioServiceProvider).speak(letter),
-              ),
+              TaskSpeakerButton(textToSpeak: letter),
               const SizedBox(width: 8),
               Text(
                 transliteration,
@@ -279,15 +276,10 @@ class _TraceTaskWidgetState extends ConsumerState<TraceTaskWidget> {
           const SizedBox(height: 8),
           Row(
             children: [
-              TextButton.icon(
-                onPressed: _clear,
-                icon: const Icon(Icons.refresh),
-                label: const Text('Clear'),
-              ),
+              TaskClearButton(onPressed: _clear),
               const Spacer(),
-              FilledButton(
+              TaskDoneButton(
                 onPressed: _canComplete ? widget.onComplete : null,
-                child: const Text('Done'),
               ),
             ],
           ),

@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../models/task.dart';
-import '../../providers.dart';
+import '../common/task_speaker_button.dart';
+import '../common/task_check_button.dart';
+import '../common/task_header.dart';
 
 class ArrangeSentenceTaskWidget extends ConsumerStatefulWidget {
   final Task task;
@@ -87,11 +89,8 @@ class _ArrangeSentenceTaskWidgetState extends ConsumerState<ArrangeSentenceTaskW
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text('Arrange the sentence', style: Theme.of(context).textTheme.titleLarge),
-              IconButton(
-                icon: const Icon(Icons.volume_up),
-                onPressed: () => ref.read(audioServiceProvider).speak(fullSentence),
-              ),
+              const TaskHeader(title: 'Arrange the sentence'),
+              TaskSpeakerButton(textToSpeak: fullSentence),
             ],
           ),
           const SizedBox(height: 24),
@@ -128,9 +127,8 @@ class _ArrangeSentenceTaskWidgetState extends ConsumerState<ArrangeSentenceTaskW
             children: _bankTiles.map((t) => _buildTile(t, inBank: true)).toList(),
           ),
           const Spacer(),
-          FilledButton(
+          TaskCheckButton(
             onPressed: _builtTiles.isEmpty ? null : _check,
-            child: const Text('Check'),
           ),
         ],
       ),

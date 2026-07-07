@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../models/task.dart';
-import '../../providers.dart';
+import '../common/task_speaker_button.dart';
+import '../common/task_header.dart';
 
 class WordSelectionTaskWidget extends ConsumerStatefulWidget {
   final Task task;
@@ -48,16 +49,13 @@ class _WordSelectionTaskWidgetState extends ConsumerState<WordSelectionTaskWidge
       padding: const EdgeInsets.all(24),
       child: Column(
         children: [
-          Text('Select the correct image', style: Theme.of(context).textTheme.titleLarge),
+          const TaskHeader(title: 'Select the correct image'),
           const SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(word, style: Theme.of(context).textTheme.displaySmall),
-              IconButton(
-                icon: const Icon(Icons.volume_up),
-                onPressed: () => ref.read(audioServiceProvider).speak(word),
-              ),
+              TaskSpeakerButton(textToSpeak: word),
             ],
           ),
           const SizedBox(height: 24),

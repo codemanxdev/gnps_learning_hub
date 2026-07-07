@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../models/task.dart';
-import '../../providers.dart';
+import '../common/task_speaker_button.dart';
+import '../common/task_header.dart';
 
 class FillInBlankTaskWidget extends ConsumerStatefulWidget {
   final Task task;
@@ -41,17 +42,20 @@ class _FillInBlankTaskWidgetState extends ConsumerState<FillInBlankTaskWidget> {
       padding: const EdgeInsets.all(24),
       child: Column(
         children: [
-          Text('Fill in the blank', style: Theme.of(context).textTheme.titleLarge),
+          const TaskHeader(title: 'Fill in the blank'),
           const SizedBox(height: 32),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(displaySentence, style: Theme.of(context).textTheme.headlineSmall),
-              IconButton(
-                icon: const Icon(Icons.volume_up),
-                onPressed: () => ref.read(audioServiceProvider).speak(
-                      parts.map((p) => p == '___' ? correctWord : p).join(' '),
-                    ),
+              Flexible(
+                child: Text(
+                  displaySentence,
+                  style: Theme.of(context).textTheme.headlineSmall,
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              TaskSpeakerButton(
+                textToSpeak: parts.map((p) => p == '___' ? correctWord : p).join(' '),
               ),
             ],
           ),

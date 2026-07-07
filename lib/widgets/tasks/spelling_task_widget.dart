@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../models/task.dart';
-import '../../providers.dart';
+import '../common/task_speaker_button.dart';
+import '../common/task_check_button.dart';
+import '../common/task_header.dart';
 
 /// Presents an image + word bank; the child drags letter/syllable tiles
 /// from the bank into a build area to spell the target word. The bank
@@ -88,7 +90,7 @@ class _SpellingTaskWidgetState extends ConsumerState<SpellingTaskWidget> {
       padding: const EdgeInsets.all(24),
       child: Column(
         children: [
-          Text('Spell the word', style: Theme.of(context).textTheme.titleLarge),
+          const TaskHeader(title: 'Spell the word'),
           const SizedBox(height: 16),
           SizedBox(
             height: 120,
@@ -99,10 +101,7 @@ class _SpellingTaskWidgetState extends ConsumerState<SpellingTaskWidget> {
             ),
           ),
           const SizedBox(height: 8),
-          IconButton(
-            icon: const Icon(Icons.volume_up),
-            onPressed: () => ref.read(audioServiceProvider).speak(targetWord),
-          ),
+          TaskSpeakerButton(textToSpeak: targetWord),
           const SizedBox(height: 16),
           // Build area
           DragTarget<_Tile>(
@@ -139,9 +138,8 @@ class _SpellingTaskWidgetState extends ConsumerState<SpellingTaskWidget> {
             children: _bankTiles.map((t) => _buildDraggableTile(t, inBank: true)).toList(),
           ),
           const Spacer(),
-          FilledButton(
+          TaskCheckButton(
             onPressed: _builtTiles.isEmpty ? null : _check,
-            child: const Text('Check'),
           ),
         ],
       ),
