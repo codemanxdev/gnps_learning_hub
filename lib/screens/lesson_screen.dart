@@ -29,13 +29,13 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
 
   void _onTaskComplete(Task task) async {
     _pointsEarned += task.pointsAwarded;
-    
+
     // Play success sound
     ref.read(audioServiceProvider).playSuccess();
 
     // Show success feedback
     setState(() => _showingSuccess = true);
-    
+
     // Wait for feedback to be visible
     await Future.delayed(const Duration(milliseconds: 1200));
 
@@ -127,10 +127,7 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
             Expanded(
               child: Stack(
                 children: [
-                  KeyedSubtree(
-                    key: ValueKey(task.id),
-                    child: _buildTask(task),
-                  ),
+                  KeyedSubtree(key: ValueKey(task.id), child: _buildTask(task)),
                   if (_showingSuccess)
                     Container(
                       color: Colors.white.withValues(alpha: 0.8),
@@ -140,10 +137,7 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
                           duration: const Duration(milliseconds: 500),
                           curve: Curves.elasticOut,
                           builder: (context, value, child) {
-                            return Transform.scale(
-                              scale: value,
-                              child: child,
-                            );
+                            return Transform.scale(scale: value, child: child);
                           },
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
@@ -156,9 +150,7 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
                               const SizedBox(height: 16),
                               Text(
                                 'Correct!',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .displaySmall
+                                style: Theme.of(context).textTheme.displaySmall
                                     ?.copyWith(
                                       color: Colors.green,
                                       fontWeight: FontWeight.bold,

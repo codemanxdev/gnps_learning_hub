@@ -1,17 +1,6 @@
-enum TaskType {
-  trace,
-  spelling,
-  wordSelection,
-  arrangeSentence,
-  fillInBlank,
-}
+import 'task_type.dart';
 
-TaskType taskTypeFromString(String value) {
-  return TaskType.values.firstWhere(
-    (t) => t.name == value,
-    orElse: () => throw ArgumentError('Unknown task type: $value'),
-  );
-}
+export 'task_type.dart';
 
 /// A single learning activity within a lesson.
 ///
@@ -44,9 +33,9 @@ class Task {
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'type': type.name,
-        'pointsAwarded': pointsAwarded,
-        'content': content,
-      };
+    'id': id,
+    'type': type.name,
+    'pointsAwarded': pointsAwarded,
+    'content': content,
+  };
 }

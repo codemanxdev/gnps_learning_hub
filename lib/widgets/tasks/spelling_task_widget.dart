@@ -61,21 +61,57 @@ class _SpellingTaskWidgetState extends ConsumerState<SpellingTaskWidget> {
     }
   }
 
-  Widget _buildDraggableTile(_Tile tile, {required bool inBank}) {
+  Widget _buildBuiltTile(_Tile tile) {
+    return GestureDetector(
+      onTap: () => _moveToBank(tile),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            tile.text,
+            style: const TextStyle(
+              fontSize: 32,
+              fontWeight: FontWeight.w500,
+              color: Colors.blue,
+            ),
+          ),
+          Container(
+            width: 30,
+            height: 3,
+            decoration: BoxDecoration(
+              color: Colors.blue.shade200,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBankTile(_Tile tile) {
     final chip = Card(
-      color: inBank ? null : Colors.blue.shade50,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        child: Text(tile.text, style: const TextStyle(fontSize: 22)),
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.grey.shade300),
+        ),
+        child: Text(
+          tile.text,
+          style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+        ),
       ),
     );
 
     return Draggable<_Tile>(
       data: tile,
       feedback: Material(color: Colors.transparent, child: chip),
-      childWhenDragging: Opacity(opacity: 0.3, child: chip),
+      childWhenDragging: Opacity(opacity: 0.2, child: chip),
       child: GestureDetector(
-        onTap: () => inBank ? _moveToBuilt(tile) : _moveToBank(tile),
+        onTap: () => _moveToBuilt(tile),
         child: chip,
       ),
     );
@@ -85,6 +121,7 @@ class _SpellingTaskWidgetState extends ConsumerState<SpellingTaskWidget> {
   Widget build(BuildContext context) {
     final imageUrl = widget.task.content['imageUrl'] as String;
     final targetWord = widget.task.content['targetWord'] as String;
+    final builtWord = _builtTiles.map((t) => t.text).join();
 
     return Padding(
       padding: const EdgeInsets.all(24),
@@ -93,49 +130,78 @@ class _SpellingTaskWidgetState extends ConsumerState<SpellingTaskWidget> {
           const TaskHeader(title: 'Spell the word'),
           const SizedBox(height: 16),
           SizedBox(
-            height: 120,
+            height: 140,
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(16),
               child: Image.asset(imageUrl, fit: BoxFit.cover, errorBuilder:
                   (_, _, _) => const Icon(Icons.image_not_supported, size: 64)),
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           TaskSpeakerButton(textToSpeak: targetWord),
-          const SizedBox(height: 16),
-          // Build area
+          const SizedBox(height: 20),
+          
+          // Resulting Word Preview (This makes matras look correct)
+          if (_builtTiles.isNotEmpty)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.blue.shade50.withValues(alpha: 0.5),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(
+                builtWord,
+                style: TextStyle(
+                  fontSize: 40,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 2,
+                  color: _lastCheckCorrect == null
+                      ? Colors.black
+                      : (_lastCheckCorrect! ? Colors.green : Colors.red),
+                ),
+              ),
+            ),
+          
+          const SizedBox(height: 24),
+          
+          // Build Area (Slots)
           DragTarget<_Tile>(
             onAcceptWithDetails: (details) => _moveToBuilt(details.data),
             builder: (context, candidateData, rejectedData) {
               return Container(
                 width: double.infinity,
-                constraints: const BoxConstraints(minHeight: 72),
-                padding: const EdgeInsets.all(8),
+                constraints: const BoxConstraints(minHeight: 100),
+                padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
+                  color: Colors.grey.shade50,
                   border: Border.all(
                     color: _lastCheckCorrect == null
-                        ? Colors.grey.shade400
+                        ? Colors.grey.shade300
                         : (_lastCheckCorrect! ? Colors.green : Colors.red),
                     width: 2,
                   ),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(16),
                 ),
                 child: Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: _builtTiles.map((t) => _buildDraggableTile(t, inBank: false)).toList(),
+                  spacing: 12,
+                  runSpacing: 16,
+                  alignment: WrapAlignment.center,
+                  children: _builtTiles.isEmpty 
+                    ? [Text('Drag letters here', style: TextStyle(color: Colors.grey.shade400))]
+                    : _builtTiles.map((t) => _buildBuiltTile(t)).toList(),
                 ),
               );
             },
           ),
-          const SizedBox(height: 24),
-          Text('Drag letters here', style: Theme.of(context).textTheme.bodySmall),
-          const SizedBox(height: 8),
+          
+          const SizedBox(height: 32),
+          
           // Letter bank
           Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: _bankTiles.map((t) => _buildDraggableTile(t, inBank: true)).toList(),
+            spacing: 12,
+            runSpacing: 12,
+            alignment: WrapAlignment.center,
+            children: _bankTiles.map((t) => _buildBankTile(t)).toList(),
           ),
           const Spacer(),
           TaskCheckButton(

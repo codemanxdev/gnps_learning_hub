@@ -40,8 +40,9 @@ class ProgressService {
     LocalProgress progress,
     Journey journey,
   ) async {
-    if (progress.unlockedLessonIds.isEmpty && journey.lessons.isNotEmpty) {
-      progress.unlockedLessonIds.add(journey.lessons.first.id);
+    final activeLessons = journey.activeLessons;
+    if (progress.unlockedLessonIds.isEmpty && activeLessons.isNotEmpty) {
+      progress.unlockedLessonIds.add(activeLessons.first.id);
       await _repository.save(progress);
     }
     return progress;
@@ -64,9 +65,10 @@ class ProgressService {
     progress.completedLessonIds.add(lessonId);
     progress.totalPoints += pointsEarned;
 
-    final index = journey.lessons.indexWhere((l) => l.id == lessonId);
-    if (index != -1 && index + 1 < journey.lessons.length) {
-      progress.unlockedLessonIds.add(journey.lessons[index + 1].id);
+    final activeLessons = journey.activeLessons;
+    final index = activeLessons.indexWhere((l) => l.id == lessonId);
+    if (index != -1 && index + 1 < activeLessons.length) {
+      progress.unlockedLessonIds.add(activeLessons[index + 1].id);
     }
 
     await _repository.save(progress);

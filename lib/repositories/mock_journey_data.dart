@@ -9,6 +9,11 @@ import '../models/journey.dart';
 /// (vargas) — foundation sounds, then guttural/palatal/retroflex/dental/
 /// labial groups, then semivowels. Vocabulary/sentence lessons come after,
 /// since they build on letters the child has already traced.
+///
+/// Each lesson carries a `visible` flag (default true) and an `order`
+/// used for journey-map placement. Set `visible: false` to hide a lesson
+/// entirely (e.g. content still being reviewed) without deleting it or
+/// renumbering later lessons.
 final Journey mockJourney = Journey.fromJson({
   'version': 2,
   'lessons': [
@@ -16,6 +21,7 @@ final Journey mockJourney = Journey.fromJson({
       'id': 'lesson_letters_01',
       'title': 'Foundation Sounds',
       'order': 1,
+      'visible': false,
       'tasks': [
         {
           'id': 'trace_01',
@@ -47,12 +53,23 @@ final Journey mockJourney = Journey.fromJson({
           'pointsAwarded': 10,
           'content': {'letter': 'ਹ', 'transliteration': 'ha'},
         },
+        {
+          'id': 'spelling_01',
+          'type': 'spelling',
+          'pointsAwarded': 15,
+          'content': {
+            'imageUrl': 'assets/images/sun.png',
+            'targetWord': 'ਸੂਰਜ',
+            'letterBank': ['ਸੂ', 'ਰ', 'ਜ', 'ਹ', 'ਅ'],
+          },
+        },
       ],
     },
     {
       'id': 'lesson_letters_02',
       'title': 'Guttural Sounds',
       'order': 2,
+      'visible': false,
       'tasks': [
         {
           'id': 'trace_06',
@@ -84,12 +101,23 @@ final Journey mockJourney = Journey.fromJson({
           'pointsAwarded': 10,
           'content': {'letter': 'ਙ', 'transliteration': 'nga'},
         },
+        {
+          'id': 'spelling_02',
+          'type': 'spelling',
+          'pointsAwarded': 15,
+          'content': {
+            'imageUrl': 'assets/images/crow.png',
+            'targetWord': 'ਕਾਂ',
+            'letterBank': ['ਕਾਂ', 'ਗ', 'ਖ', 'ਘ'],
+          },
+        },
       ],
     },
     {
       'id': 'lesson_letters_03',
       'title': 'Palatal Sounds',
       'order': 3,
+      'visible': false,
       'tasks': [
         {
           'id': 'trace_11',
@@ -121,12 +149,23 @@ final Journey mockJourney = Journey.fromJson({
           'pointsAwarded': 10,
           'content': {'letter': 'ਞ', 'transliteration': 'nya'},
         },
+        {
+          'id': 'fillInBlank_01',
+          'type': 'fillInBlank',
+          'pointsAwarded': 15,
+          'content': {
+            'sentenceParts': ['ਇਹ', '___', 'ਹੈ'],
+            'correctWord': 'ਚਿੜੀ',
+            'options': ['ਚਿੜੀ', 'ਗਾਂ', 'ਬਿੱਲੀ'],
+          },
+        },
       ],
     },
     {
       'id': 'lesson_letters_04',
       'title': 'Retroflex Sounds',
       'order': 4,
+      'visible': false,
       'tasks': [
         {
           'id': 'trace_16',
@@ -164,6 +203,7 @@ final Journey mockJourney = Journey.fromJson({
       'id': 'lesson_letters_05',
       'title': 'Dental Sounds',
       'order': 5,
+      'visible': true,
       'tasks': [
         {
           'id': 'trace_21',
@@ -201,6 +241,7 @@ final Journey mockJourney = Journey.fromJson({
       'id': 'lesson_letters_06',
       'title': 'Labial Sounds',
       'order': 6,
+      'visible': false,
       'tasks': [
         {
           'id': 'trace_26',
@@ -238,6 +279,7 @@ final Journey mockJourney = Journey.fromJson({
       'id': 'lesson_letters_07',
       'title': 'Semivowels',
       'order': 7,
+      'visible': false,
       'tasks': [
         {
           'id': 'trace_31',
@@ -267,6 +309,7 @@ final Journey mockJourney = Journey.fromJson({
           'id': 'trace_35',
           'type': 'trace',
           'pointsAwarded': 10,
+          // still validating stroke recognition for this letter's shape
           'content': {'letter': 'ੜ', 'transliteration': 'rra'},
         },
       ],
@@ -275,6 +318,7 @@ final Journey mockJourney = Journey.fromJson({
       'id': 'lesson_002',
       'title': 'Animals',
       'order': 8,
+      'visible': true,
       'tasks': [
         {
           'id': 't3',
@@ -296,12 +340,33 @@ final Journey mockJourney = Journey.fromJson({
             'options': ['ਜਾਂਦਾ', 'ਖਾਂਦਾ', 'ਸੌਂਦਾ'],
           },
         },
+        {
+          'id': 't6',
+          'type': 'spelling',
+          'pointsAwarded': 15,
+          'content': {
+            'imageUrl': 'assets/images/dog.png',
+            'targetWord': 'ਕੁੱਤਾ',
+            'letterBank': ['ਕੁ', 'ੱ', 'ਤਾ', 'ਬ', 'ਲੀ'],
+          },
+        },
+        {
+          'id': 't7',
+          'type': 'fillInBlank',
+          'pointsAwarded': 15,
+          'content': {
+            'sentenceParts': ['ਇਹ', '___', 'ਹੈ'],
+            'correctWord': 'ਗਾਂ',
+            'options': ['ਗਾਂ', 'ਕੁੱਤਾ', 'ਬਿੱਲੀ'],
+          },
+        },
       ],
     },
     {
       'id': 'lesson_003',
       'title': 'Simple Sentences',
       'order': 9,
+      'visible': true,
       'tasks': [
         {
           'id': 't5',
@@ -310,6 +375,25 @@ final Journey mockJourney = Journey.fromJson({
           'content': {
             'words': ['ਮੈਂ', 'ਸਕੂਲ', 'ਜਾਂਦਾ', 'ਹਾਂ'],
             'correctOrder': [0, 1, 2, 3],
+          },
+        },
+        {
+          'id': 't8',
+          'type': 'arrangeSentence',
+          'pointsAwarded': 20,
+          'content': {
+            'words': ['ਇਹ', 'ਮੇਰੀ', 'ਕਿਤਾਬ', 'ਹੈ'],
+            'correctOrder': [0, 1, 2, 3],
+          },
+        },
+        {
+          'id': 't9',
+          'type': 'spelling',
+          'pointsAwarded': 15,
+          'content': {
+            'imageUrl': 'assets/images/book.png',
+            'targetWord': 'ਕਿਤਾਬ',
+            'letterBank': ['ਕਿ', 'ਤਾ', 'ਬ', 'ਮੇਰੀ', 'ਸਕੂਲ'],
           },
         },
       ],

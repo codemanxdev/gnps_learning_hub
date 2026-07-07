@@ -96,7 +96,7 @@ class _JourneyContent extends StatelessWidget {
         ),
         Expanded(
           child: LessonPath(
-            lessons: journey.lessons,
+            lessons: journey.activeLessons,
             unlockedIds: progress.unlockedLessonIds,
             completedIds: progress.completedLessonIds,
             onTapLesson: onTapLesson,
