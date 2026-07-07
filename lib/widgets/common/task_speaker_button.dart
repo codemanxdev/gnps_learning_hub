@@ -9,15 +9,28 @@ class TaskSpeakerButton extends ConsumerWidget {
   const TaskSpeakerButton({
     super.key,
     required this.textToSpeak,
-    this.iconSize = 24,
+    this.iconSize = 48,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return IconButton(
-      icon: Icon(Icons.volume_up, size: iconSize),
-      onPressed: () => ref.read(audioServiceProvider).speak(textToSpeak),
-      tooltip: 'Hear pronunciation',
+    final colorScheme = Theme.of(context).colorScheme;
+    
+    return Container(
+      decoration: BoxDecoration(
+        color: colorScheme.primaryContainer,
+        border: Border.all(
+          color: colorScheme.primary,
+          width: 1.5,
+        ),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: IconButton(
+        icon: Icon(Icons.campaign, size: iconSize),
+        onPressed: () => ref.read(audioServiceProvider).speak(textToSpeak),
+        tooltip: 'Hear pronunciation',
+        color: colorScheme.onPrimaryContainer,
+      ),
     );
   }
 }
