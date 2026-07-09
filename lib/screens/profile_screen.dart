@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../config/reward_config.dart';
+import '../models/shop_item.dart';
 import '../providers.dart';
+import 'avatar_customization_screen.dart';
+import '../widgets/avatar/avatar_preview.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -51,6 +54,7 @@ class ProfileScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final progressAsync = ref.watch(progressProvider);
+    final catalog = ref.watch(shopCatalogProvider); // List<ShopItem>, sync
 
     return progressAsync.when(
       data: (progress) => SafeArea(
@@ -64,6 +68,18 @@ class ProfileScreen extends ConsumerWidget {
                 style: Theme.of(context).textTheme.headlineMedium,
               ),
               const SizedBox(height: 20),
+              Center(
+                child: _AvatarWithEditBadge(
+                  equippedItemIds: progress.equippedItemIds,
+                  catalog: catalog,
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => const AvatarCustomizationScreen(),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
               Row(
                 children: [
                   Expanded(
@@ -111,6 +127,57 @@ class ProfileScreen extends ConsumerWidget {
       ),
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (e, _) => Center(child: Text('Error loading profile: $e')),
+    );
+  }
+}
+
+class _AvatarWithEditBadge extends StatelessWidget {
+  final Map<String, String> equippedItemIds;
+  final List<ShopItem> catalog;
+  final VoidCallback onTap;
+
+  const _AvatarWithEditBadge({
+    required this.equippedItemIds,
+    required this.catalog,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          CircleAvatar(
+            radius: 48,
+            backgroundColor: Colors.grey.shade200,
+            child: ClipOval(
+              child: SizedBox(
+                width: 96,
+                height: 96,
+                child: AvatarPreview(
+                  equippedItemIds: equippedItemIds,
+                  catalog: catalog,
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: -2,
+            right: -2,
+            child: Container(
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primary,
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.white, width: 2),
+              ),
+              child: const Icon(Icons.edit, size: 16, color: Colors.white),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

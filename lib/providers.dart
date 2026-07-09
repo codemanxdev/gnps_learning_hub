@@ -7,6 +7,7 @@ import 'repositories/content_repository.dart';
 import 'repositories/progress_repository.dart';
 import 'services/audio_service.dart';
 import 'services/progress_service.dart';
+import 'repositories/shop_repository.dart';
 
 final contentRepositoryProvider = Provider((ref) => ContentRepository());
 final progressRepositoryProvider = Provider((ref) => ProgressRepository());
@@ -23,6 +24,12 @@ final progressServiceProvider = Provider((ref) {
 final journeyProvider = FutureProvider<Journey>((ref) async {
   final repo = ref.read(contentRepositoryProvider);
   return repo.checkForUpdatesAndSync();
+});
+
+final shopRepositoryProvider = Provider((ref) => ShopRepository());
+
+final shopCatalogProvider = Provider<List<ShopItem>>((ref) {
+  return ref.read(shopRepositoryProvider).getCatalog();
 });
 
 class ProgressNotifier extends StateNotifier<AsyncValue<LocalProgress>> {
@@ -73,9 +80,6 @@ class ProgressNotifier extends StateNotifier<AsyncValue<LocalProgress>> {
     state = AsyncValue.data(LocalProgress.fromJson(updated.toJson()));
   }
 
-  /// Attempts to purchase [item] with the user's gems. Returns the result
-  /// so the UI can show appropriate feedback (success / can't afford /
-  /// already owned).
   Future<PurchaseResult> purchaseItem(ShopItem item) async {
     await _initialLoad;
     final current = state.value;
@@ -88,8 +92,28 @@ class ProgressNotifier extends StateNotifier<AsyncValue<LocalProgress>> {
     return result;
   }
 
-  /// Wipes progress and resets to a fresh default. Used by the
-  /// "Reset Progress" button on the Profile screen.
+  /// Equips [item] into its avatar slot. [item] must already be owned
+  /// (or free/default) — callers should only offer owned items in the
+  /// customization UI. No-ops if the item has no avatarSlot.
+  Future<void> equipItem(ShopItem item) async {
+    await _initialLoad;
+    final current = state.value;
+    if (current == null || item.avatarSlot == null) return;
+
+    final owned =
+        item.price == 0 || (current.ownedItemQuantities[item.id] ?? 0) > 0;
+    if (!owned) return;
+
+    final updatedEquipped = Map<String, String>.from(current.equippedItemIds)
+      ..[item.avatarSlot!.name] = item.id;
+
+    final updated = LocalProgress.fromJson(current.toJson())
+      ..equippedItemIds = updatedEquipped;
+
+    await _repository.save(updated);
+    state = AsyncValue.data(updated);
+  }
+
   Future<void> reset() async {
     await _initialLoad;
     await _repository.clear();

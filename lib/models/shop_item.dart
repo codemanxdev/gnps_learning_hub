@@ -1,16 +1,9 @@
 import 'package:flutter/material.dart';
 
-/// Broad grouping used to organize the shop UI into sections. Add more
-/// categories here as new kinds of items are introduced.
 enum ShopItemCategory { avatar, powerUp }
 
-/// A single purchasable item.
-///
-/// [stackable] controls purchase behavior:
-/// - false (default): a one-time unlock, e.g. a cosmetic avatar. Once
-///   owned, the shop shows "Owned" instead of a buy button.
-/// - true: can be purchased repeatedly to accumulate a quantity, e.g. a
-///   streak freeze that gets consumed over time.
+enum AvatarSlot { base, turban, clothes, accessory }
+
 class ShopItem {
   final String id;
   final String name;
@@ -20,6 +13,7 @@ class ShopItem {
   final int price;
   final ShopItemCategory category;
   final bool stackable;
+  final AvatarSlot? avatarSlot;
 
   const ShopItem({
     required this.id,
@@ -30,5 +24,9 @@ class ShopItem {
     required this.price,
     required this.category,
     this.stackable = false,
-  });
+    this.avatarSlot,
+  }) : assert(
+         category != ShopItemCategory.avatar || avatarSlot != null,
+         'Avatar items must specify an avatarSlot',
+       );
 }

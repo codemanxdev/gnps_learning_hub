@@ -1,3 +1,5 @@
+import 'shop_item.dart';
+
 class LocalProgress {
   int totalPoints;
   int currentStreak;
@@ -5,6 +7,14 @@ class LocalProgress {
   Set<String> completedLessonIds;
   Set<String> unlockedLessonIds;
   Map<String, int> ownedItemQuantities;
+  Map<String, String> equippedItemIds;
+
+  static const Map<AvatarSlot, String> defaultEquippedItemIds = {
+    AvatarSlot.base: 'avatar_base_default',
+    AvatarSlot.turban: 'turban_none',
+    AvatarSlot.clothes: 'clothes_default',
+    AvatarSlot.accessory: 'accessory_none',
+  };
 
   LocalProgress({
     this.totalPoints = 0,
@@ -13,9 +23,15 @@ class LocalProgress {
     Set<String>? completedLessonIds,
     Set<String>? unlockedLessonIds,
     Map<String, int>? ownedItemQuantities,
+    Map<String, String>? equippedItemIds,
   }) : completedLessonIds = completedLessonIds ?? {},
        unlockedLessonIds = unlockedLessonIds ?? {},
-       ownedItemQuantities = ownedItemQuantities ?? {};
+       ownedItemQuantities = ownedItemQuantities ?? {},
+       equippedItemIds =
+           equippedItemIds ??
+           defaultEquippedItemIds.map(
+             (slot, itemId) => MapEntry(slot.name, itemId),
+           );
 
   factory LocalProgress.fromJson(Map<String, dynamic> json) {
     return LocalProgress(
@@ -36,6 +52,17 @@ class LocalProgress {
             ) ??
             {},
       ),
+      equippedItemIds: {
+        ...defaultEquippedItemIds.map(
+          (slot, itemId) => MapEntry(slot.name, itemId),
+        ),
+        ...Map<String, String>.from(
+          (json['equippedItemIds'] as Map?)?.map(
+                (key, value) => MapEntry(key as String, value as String),
+              ) ??
+              {},
+        ),
+      },
     );
   }
 
@@ -46,5 +73,6 @@ class LocalProgress {
     'completedLessonIds': completedLessonIds.toList(),
     'unlockedLessonIds': unlockedLessonIds.toList(),
     'ownedItemQuantities': ownedItemQuantities,
+    'equippedItemIds': equippedItemIds,
   };
 }

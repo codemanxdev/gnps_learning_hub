@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../config/reward_config.dart';
-import '../config/shop_catalog.dart';
 import '../models/progress.dart';
 import '../models/shop_item.dart';
 import '../providers.dart';
@@ -61,6 +60,12 @@ class _ShopContent extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final service = ref.read(progressServiceProvider);
+    final catalog = ref.watch(shopCatalogProvider);
+
+    // Free default items (price 0) exist so every avatar slot always has
+    // something equipped, but they're not meant to be "bought" — hide
+    // them from the shop grid so this screen only shows real purchases.
+    final purchasableCatalog = catalog.where((i) => i.price > 0).toList();
 
     return ListView(
       padding: const EdgeInsets.all(20),
@@ -68,7 +73,7 @@ class _ShopContent extends ConsumerWidget {
         _GemBalance(points: progress.totalPoints),
         const SizedBox(height: 24),
         for (final category in ShopItemCategory.values)
-          if (shopCatalog.any((i) => i.category == category)) ...[
+          if (purchasableCatalog.any((i) => i.category == category)) ...[
             Text(
               _categoryLabel(category),
               style: Theme.of(
@@ -84,7 +89,7 @@ class _ShopContent extends ConsumerWidget {
               crossAxisSpacing: 12,
               childAspectRatio: 0.85,
               children: [
-                for (final item in shopCatalog.where(
+                for (final item in purchasableCatalog.where(
                   (i) => i.category == category,
                 ))
                   _ShopItemCard(
