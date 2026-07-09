@@ -45,20 +45,24 @@ class AudioService {
   Future<void> playSuccess() async {
     await _init();
     try {
+      // Try custom asset first
       await _sfxPlayer.play(AssetSource('sounds/success.wav'));
-    } catch (_) {
-      // Fail silently rather than crash.
+    } catch (e) {
+      // Fallback to system sound if asset fails or is missing
+      await SystemSound.play(SystemSoundType.click);
     }
-    await HapticFeedback.lightImpact();
+    await HapticFeedback.mediumImpact();
   }
 
-  ///Failure
+  /// Failure
   Future<void> playFailure() async {
     await _init();
     try {
+      // Try custom asset first
       await _sfxPlayer.play(AssetSource('sounds/failure.wav'));
-    } catch (_) {
-      // Fail silently rather than crash.
+    } catch (e) {
+      // Fallback to system haptic/selection click
+      await HapticFeedback.heavyImpact();
     }
     await HapticFeedback.selectionClick();
   }

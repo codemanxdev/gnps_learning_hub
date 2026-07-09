@@ -128,10 +128,19 @@ class _StartBubbleState extends State<_StartBubble> with SingleTickerProviderSta
         decoration: BoxDecoration(
           color: widget.color,
           borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: Colors.lightGreen,
+            width: 3,
+          ),
         ),
         child: const Text(
           'START',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12, letterSpacing: 1),
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+            letterSpacing: 1,
+          ),
         ),
       ),
     );
