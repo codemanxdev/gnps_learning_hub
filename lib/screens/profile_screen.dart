@@ -5,6 +5,8 @@ import '../config/reward_config.dart';
 import '../models/shop_item.dart';
 import '../providers.dart';
 import 'avatar_customization_screen.dart';
+import 'streak_screen.dart';
+import 'shop_screen.dart';
 import '../widgets/avatar/avatar_preview.dart';
 
 class ProfileScreen extends ConsumerWidget {
@@ -51,6 +53,18 @@ class ProfileScreen extends ConsumerWidget {
     }
   }
 
+  void _openStreakScreen(BuildContext context) {
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => const StreakScreen()));
+  }
+
+  void _openShopScreen(BuildContext context) {
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => const ShopScreen()));
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final progressAsync = ref.watch(progressProvider);
@@ -83,23 +97,29 @@ class ProfileScreen extends ConsumerWidget {
               Row(
                 children: [
                   Expanded(
-                    child: _StatCard(
-                      icon: Icons.local_fire_department,
-                      color: Colors.orange,
-                      label: 'Streak',
-                      value:
-                          '${progress.currentStreak} day${progress.currentStreak == 1 ? '' : 's'}',
+                    child: GestureDetector(
+                      onTap: () => _openStreakScreen(context),
+                      child: _StatCard(
+                        icon: Icons.local_fire_department,
+                        color: Colors.orange,
+                        label: 'Streak',
+                        value:
+                            '${progress.currentStreak} day${progress.currentStreak == 1 ? '' : 's'}',
+                      ),
                     ),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
-                    child: _StatCard(
-                      icon: RewardConfig.icon,
-                      color: RewardConfig.color,
-                      label:
-                          RewardConfig.labelPlural[0].toUpperCase() +
-                          RewardConfig.labelPlural.substring(1),
-                      value: '${progress.totalPoints}',
+                    child: GestureDetector(
+                      onTap: () => _openShopScreen(context),
+                      child: _StatCard(
+                        icon: RewardConfig.icon,
+                        color: RewardConfig.color,
+                        label:
+                            RewardConfig.labelPlural[0].toUpperCase() +
+                            RewardConfig.labelPlural.substring(1),
+                        value: '${progress.totalPoints}',
+                      ),
                     ),
                   ),
                 ],
