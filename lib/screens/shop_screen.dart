@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import '../config/reward_config.dart';
 import '../models/progress.dart';
@@ -172,7 +173,9 @@ class _ShopItemCard extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Icon(item.icon, color: item.color, size: 40),
+          item.imageAssetPath != null
+              ? SvgPicture.asset(item.imageAssetPath!, width: 56, height: 56)
+              : Icon(item.icon, color: item.color, size: 56),
           const SizedBox(height: 8),
           Text(
             item.name,

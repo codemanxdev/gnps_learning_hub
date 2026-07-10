@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import '../models/progress.dart';
 import '../models/shop_item.dart';
@@ -214,11 +215,15 @@ class _ItemTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tileColor = item.color ?? Colors.grey;
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: item.color.withValues(alpha: 0.15),
+          color: item.imageAssetPath != null
+              ? Colors.grey.withValues(alpha: 0.08)
+              : tileColor.withValues(alpha: 0.15),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: selected
@@ -227,7 +232,12 @@ class _ItemTile extends StatelessWidget {
             width: 2,
           ),
         ),
-        child: Icon(item.icon, color: item.color, size: 28),
+        child: item.imageAssetPath != null
+            ? Padding(
+                padding: const EdgeInsets.all(4),
+                child: SvgPicture.asset(item.imageAssetPath!),
+              )
+            : Icon(item.icon, color: tileColor, size: 28),
       ),
     );
   }

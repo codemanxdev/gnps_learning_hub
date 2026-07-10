@@ -1,0 +1,15 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>Sikh boy avatar with maroon patka</title>
+<desc>Cartoon avatar of a young Sikh boy wearing a maroon patka, smiling with a gap-tooth grin</desc>
+<circle cx="100" cy="150" r="46" fill="#B33B3B"/>
+<circle cx="40" cy="112" r="10" fill="#A66A3E"/>
+<circle cx="160" cy="112" r="10" fill="#A66A3E"/>
+<circle cx="100" cy="112" r="62" fill="#A66A3E"/>
+<path d="M55 108 Q52 60 100 55 Q148 60 145 108 Q148 90 100 88 Q52 90 55 108 Z" fill="#1E1712"/>
+<path d="M72 106 Q80 98 88 106" fill="none" stroke="#1E1712" stroke-width="3" stroke-linecap="round"/>
+<path d="M112 106 Q120 98 128 106" fill="none" stroke="#1E1712" stroke-width="3" stroke-linecap="round"/>
+<path d="M75 133 Q100 152 125 133 Q100 145 75 133 Z" fill="#6B3421"/>
+<path d="M42 78 Q100 30 158 78 Q160 100 150 96 Q152 68 100 60 Q48 68 50 96 Q40 100 42 78 Z" fill="#B33B3B"/>
+<path d="M50 78 Q100 42 150 78 L150 68 Q100 34 50 68 Z" fill="#8C2C2C"/>
+<circle cx="100" cy="46" r="7" fill="#B33B3B"/>
+</svg>

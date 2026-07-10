@@ -27,7 +27,7 @@ final Journey mockJourney = Journey.fromJson({
       'id': 'lesson_letters_01',
       'title': 'Foundation Sounds',
       'order': 1,
-      'visible': false,
+      'visible': true,
       'tasks': [
         {
           'id': 'trace_01',
@@ -65,7 +65,7 @@ final Journey mockJourney = Journey.fromJson({
       'id': 'lesson_letters_02',
       'title': 'Guttural Sounds',
       'order': 2,
-      'visible': false,
+      'visible': true,
       'tasks': [
         {
           'id': 'trace_06',

@@ -1,0 +1,17 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>Sikh boy avatar with blue patka</title>
+<desc>Cartoon avatar of a young Sikh boy wearing a blue patka, smiling</desc>
+<circle cx="100" cy="150" r="46" fill="#3E7FB8"/>
+<circle cx="40" cy="112" r="10" fill="#E8B786"/>
+<circle cx="160" cy="112" r="10" fill="#E8B786"/>
+<circle cx="100" cy="112" r="62" fill="#E8B786"/>
+<path d="M55 108 Q52 60 100 55 Q148 60 145 108 Q148 90 100 88 Q52 90 55 108 Z" fill="#2B2118"/>
+<circle cx="80" cy="112" r="8" fill="#fff" stroke="#2B2118" stroke-width="1.5"/>
+<circle cx="80" cy="112" r="4" fill="#2B2118"/>
+<circle cx="120" cy="112" r="8" fill="#fff" stroke="#2B2118" stroke-width="1.5"/>
+<circle cx="120" cy="112" r="4" fill="#2B2118"/>
+<path d="M78 139 Q100 155 122 139" fill="none" stroke="#8D4B3B" stroke-width="4" stroke-linecap="round"/>
+<path d="M42 78 Q100 30 158 78 Q160 100 150 96 Q152 68 100 60 Q48 68 50 96 Q40 100 42 78 Z" fill="#3E7FB8"/>
+<path d="M50 78 Q100 42 150 78 L150 68 Q100 34 50 68 Z" fill="#2E608C"/>
+<circle cx="100" cy="46" r="7" fill="#3E7FB8"/>
+</svg>
