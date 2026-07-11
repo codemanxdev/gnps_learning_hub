@@ -14,6 +14,7 @@ class LessonPath extends StatelessWidget {
   final List<Lesson> lessons;
   final Set<String> unlockedIds;
   final Set<String> completedIds;
+  final Set<String> completedSectionIds;
   final void Function(Lesson lesson) onTapLesson;
 
   static const double _verticalSpacing = 150;
@@ -26,6 +27,7 @@ class LessonPath extends StatelessWidget {
     required this.lessons,
     required this.unlockedIds,
     required this.completedIds,
+    required this.completedSectionIds,
     required this.onTapLesson,
   });
 
@@ -44,6 +46,19 @@ class LessonPath extends StatelessWidget {
     if (lesson.id == _currentLessonId) return LessonNodeState.current;
     if (unlockedIds.contains(lesson.id)) return LessonNodeState.unlocked;
     return LessonNodeState.locked;
+  }
+
+  bool _isStarted(Lesson lesson) {
+    if (completedIds.contains(lesson.id)) return true;
+    return lesson.sections.any((s) => completedSectionIds.contains(s.id));
+  }
+
+  // Counts how many of this lesson's sections/chapters are completed,
+  // used to drive the segmented progress ring on the node.
+  int _completedSectionsFor(Lesson lesson) {
+    return lesson.sections
+        .where((s) => completedSectionIds.contains(s.id))
+        .length;
   }
 
   double _xOffsetFor(int index, double centerX) {
@@ -210,13 +225,16 @@ class LessonPath extends StatelessWidget {
                 ..._buildBirds(viewHeight, constraints.maxWidth),
                 for (int i = 0; i < lessons.length; i++)
                   Positioned(
-                    left: nodeCenters[i].dx - (_nodeSize + 24) / 2,
-                    top: nodeCenters[i].dy - _nodeSize / 2 - 44,
-                    width: _nodeSize + 24,
+                    left: nodeCenters[i].dx - 70,
+                    top: nodeCenters[i].dy - _nodeSize / 2 - 50,
+                    width: 140,
                     child: LessonNode(
                       title: lessons[i].title,
                       state: _stateFor(lessons[i]),
+                      isStarted: _isStarted(lessons[i]),
                       size: _nodeSize,
+                      chapterCount: lessons[i].sections.length,
+                      completedChapters: _completedSectionsFor(lessons[i]),
                       onTap: unlockedIds.contains(lessons[i].id)
                           ? () => onTapLesson(lessons[i])
                           : null,

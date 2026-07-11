@@ -63,18 +63,20 @@ class ProgressNotifier extends StateNotifier<AsyncValue<LocalProgress>> {
     state = AsyncValue.data(updated);
   }
 
-  Future<void> completeLesson(
-    Journey journey,
-    String lessonId,
-    int points,
-  ) async {
+  Future<void> completeSection({
+    required Journey journey,
+    required String lessonId,
+    required String sectionId,
+    required int points,
+  }) async {
     await _initialLoad;
     final current = state.value;
     if (current == null) return;
-    final updated = await _service.completeLesson(
+    final updated = await _service.completeSection(
       progress: current,
       journey: journey,
       lessonId: lessonId,
+      sectionId: sectionId,
       pointsEarned: points,
     );
     state = AsyncValue.data(LocalProgress.fromJson(updated.toJson()));

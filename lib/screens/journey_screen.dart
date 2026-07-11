@@ -105,6 +105,7 @@ class _JourneyContent extends StatelessWidget {
             lessons: journey.activeLessons,
             unlockedIds: progress.unlockedLessonIds,
             completedIds: progress.completedLessonIds,
+            completedSectionIds: progress.completedSectionIds,
             onTapLesson: onTapLesson,
           ),
         ),

@@ -62,21 +62,34 @@ class ProgressService {
   bool isLessonCompleted(LocalProgress progress, String lessonId) =>
       progress.completedLessonIds.contains(lessonId);
 
-  /// Marks a lesson complete, awards points, and unlocks the next lesson
-  /// in order (if there is one).
-  Future<LocalProgress> completeLesson({
+  bool isSectionCompleted(LocalProgress progress, String sectionId) =>
+      progress.completedSectionIds.contains(sectionId);
+
+  /// Marks a section (chapter) complete, awards points, and if all sections
+  /// in the lesson are done, unlocks the next lesson.
+  Future<LocalProgress> completeSection({
     required LocalProgress progress,
     required Journey journey,
     required String lessonId,
+    required String sectionId,
     required int pointsEarned,
   }) async {
-    progress.completedLessonIds.add(lessonId);
+    progress.completedSectionIds.add(sectionId);
     progress.totalPoints += pointsEarned;
 
-    final activeLessons = journey.activeLessons;
-    final index = activeLessons.indexWhere((l) => l.id == lessonId);
-    if (index != -1 && index + 1 < activeLessons.length) {
-      progress.unlockedLessonIds.add(activeLessons[index + 1].id);
+    // Check if the whole lesson is now complete
+    final lesson = journey.lessons.firstWhere((l) => l.id == lessonId);
+    final allSectionsCompleted =
+        lesson.sections.every((s) => progress.completedSectionIds.contains(s.id));
+
+    if (allSectionsCompleted) {
+      progress.completedLessonIds.add(lessonId);
+
+      final activeLessons = journey.activeLessons;
+      final index = activeLessons.indexWhere((l) => l.id == lessonId);
+      if (index != -1 && index + 1 < activeLessons.length) {
+        progress.unlockedLessonIds.add(activeLessons[index + 1].id);
+      }
     }
 
     await _repository.save(progress);

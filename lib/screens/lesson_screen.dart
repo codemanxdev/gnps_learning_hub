@@ -34,6 +34,29 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
 
   List<Task> get _allTasks => widget.lesson.allTasks;
 
+  @override
+  void initState() {
+    super.initState();
+    _initializeTaskIndex();
+  }
+
+  void _initializeTaskIndex() {
+    final progress = ref.read(progressProvider).value;
+    if (progress == null) return;
+
+    int accumulatedTasks = 0;
+    for (final section in widget.lesson.sections) {
+      if (progress.completedSectionIds.contains(section.id)) {
+        accumulatedTasks += section.tasks.length;
+      } else {
+        break;
+      }
+    }
+    // If the whole lesson was already completed, reset to 0 to allow replay,
+    // otherwise start at the beginning of the first incomplete section.
+    _taskIndex = accumulatedTasks < _allTasks.length ? accumulatedTasks : 0;
+  }
+
   void _onTaskComplete(Task task) async {
     _pointsEarned += task.pointsAwarded;
 
@@ -45,17 +68,32 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
     if (!mounted) return;
     setState(() => _showingSuccess = false);
 
-    final isLastTask = _taskIndex + 1 >= _allTasks.length;
-
-    if (!isLastTask) {
-      setState(() => _taskIndex++);
-      return;
+    // Find which section this task belongs to
+    LessonSection? currentSection;
+    int accumulatedTasks = 0;
+    for (final section in widget.lesson.sections) {
+      accumulatedTasks += section.tasks.length;
+      if (_taskIndex < accumulatedTasks) {
+        currentSection = section;
+        break;
+      }
     }
 
-    // Lesson complete: burst reward icons from the center of the screen
-    // toward the banner's points chip, then commit progress once they've
-    // landed — so the points counter's count-up animation starts right
-    // as the icons arrive.
+    final isLastTaskInSection = _taskIndex + 1 == accumulatedTasks;
+    final isLastTaskInLesson = _taskIndex + 1 == _allTasks.length;
+
+    if (isLastTaskInSection) {
+      await _handleSectionComplete(currentSection!, isLastTaskInLesson);
+    } else {
+      setState(() => _taskIndex++);
+    }
+  }
+
+  Future<void> _handleSectionComplete(
+    LessonSection section,
+    bool isLastInLesson,
+  ) async {
+    // Burst reward icons from the center of the screen
     final screenSize = MediaQuery.sizeOf(context);
     final origin = Offset(screenSize.width / 2, screenSize.height / 2);
 
@@ -65,20 +103,61 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
       targetKey: _starIconKey,
       icon: RewardConfig.icon,
       color: RewardConfig.color,
-      count: (_pointsEarned / 5).clamp(4, 12).round(),
+      count: 8,
     );
 
     if (!mounted) return;
 
-    await ref
-        .read(progressProvider.notifier)
-        .completeLesson(widget.journey, widget.lesson.id, _pointsEarned);
-    if (mounted) _showCompletionDialog();
+    // Persist progress for this section
+    await ref.read(progressProvider.notifier).completeSection(
+      journey: widget.journey,
+      lessonId: widget.lesson.id,
+      sectionId: section.id,
+      points: _pointsEarned,
+    );
+
+    // Reset points earned for the next section
+    _pointsEarned = 0;
+
+    if (isLastInLesson) {
+      if (mounted) _showCompletionDialog();
+    } else {
+      if (mounted) _showSectionCompletionDialog(section);
+    }
   }
 
   void _onTaskIncorrect() {
     HapticFeedback.heavyImpact();
     ref.read(audioServiceProvider).playFailure();
+  }
+
+  void _showSectionCompletionDialog(LessonSection section) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => AlertDialog(
+        title: Text('${section.title} Complete! 🏆'),
+        content: const Text(
+          'Great job! You finished this chapter. Ready for the next one?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(); // close dialog
+              Navigator.of(context).pop(); // back to journey
+            },
+            child: const Text('Back to Map'),
+          ),
+          FilledButton(
+            onPressed: () {
+              Navigator.of(context).pop(); // close dialog
+              setState(() => _taskIndex++); // move to next task (start of next section)
+            },
+            child: const Text('Continue'),
+          ),
+        ],
+      ),
+    );
   }
 
   void _showCompletionDialog() {

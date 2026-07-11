@@ -5,6 +5,7 @@ class LocalProgress {
   int currentStreak;
   DateTime? lastActiveDate;
   Set<String> completedLessonIds;
+  Set<String> completedSectionIds;
   Set<String> unlockedLessonIds;
   Map<String, int> ownedItemQuantities;
   Map<String, String> equippedItemIds;
@@ -21,10 +22,12 @@ class LocalProgress {
     this.currentStreak = 0,
     this.lastActiveDate,
     Set<String>? completedLessonIds,
+    Set<String>? completedSectionIds,
     Set<String>? unlockedLessonIds,
     Map<String, int>? ownedItemQuantities,
     Map<String, String>? equippedItemIds,
   }) : completedLessonIds = completedLessonIds ?? {},
+       completedSectionIds = completedSectionIds ?? {},
        unlockedLessonIds = unlockedLessonIds ?? {},
        ownedItemQuantities = ownedItemQuantities ?? {},
        equippedItemIds =
@@ -42,6 +45,9 @@ class LocalProgress {
           : null,
       completedLessonIds: Set<String>.from(
         json['completedLessonIds'] as List? ?? [],
+      ),
+      completedSectionIds: Set<String>.from(
+        json['completedSectionIds'] as List? ?? [],
       ),
       unlockedLessonIds: Set<String>.from(
         json['unlockedLessonIds'] as List? ?? [],
@@ -71,6 +77,7 @@ class LocalProgress {
     'currentStreak': currentStreak,
     'lastActiveDate': lastActiveDate?.toIso8601String(),
     'completedLessonIds': completedLessonIds.toList(),
+    'completedSectionIds': completedSectionIds.toList(),
     'unlockedLessonIds': unlockedLessonIds.toList(),
     'ownedItemQuantities': ownedItemQuantities,
     'equippedItemIds': equippedItemIds,
