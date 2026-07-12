@@ -123,6 +123,14 @@ class ProgressNotifier extends StateNotifier<AsyncValue<LocalProgress>> {
     await _repository.save(fresh);
     state = AsyncValue.data(fresh);
   }
+
+  Future<void> updateUserName(String name) async {
+    await _initialLoad;
+    final current = state.value;
+    if (current == null) return;
+    final updated = await _service.updateUserName(current, name);
+    state = AsyncValue.data(updated);
+  }
 }
 
 final progressProvider =

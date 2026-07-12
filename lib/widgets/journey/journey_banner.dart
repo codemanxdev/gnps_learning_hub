@@ -54,11 +54,15 @@ class JourneyBanner extends ConsumerWidget {
                 ),
               ),
               const SizedBox(width: 10),
-              Text(
-                'Hi there! 👋',
-                style: Theme.of(
-                  context,
-                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+              progressAsync.when(
+                data: (progress) => Text(
+                  'Hi${progress.userName != null && progress.userName!.isNotEmpty ? ', ${progress.userName}' : ' there'}! 👋',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                loading: () => const SizedBox.shrink(),
+                error: (_, _) => const Text('Hi there! 👋'),
               ),
             ],
           ),

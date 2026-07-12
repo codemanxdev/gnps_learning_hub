@@ -1,6 +1,7 @@
 import 'shop_item.dart';
 
 class LocalProgress {
+  String? userName;
   int totalPoints;
   int currentStreak;
   DateTime? lastActiveDate;
@@ -18,6 +19,7 @@ class LocalProgress {
   };
 
   LocalProgress({
+    this.userName,
     this.totalPoints = 0,
     this.currentStreak = 0,
     this.lastActiveDate,
@@ -38,6 +40,7 @@ class LocalProgress {
 
   factory LocalProgress.fromJson(Map<String, dynamic> json) {
     return LocalProgress(
+      userName: json['userName'] as String?,
       totalPoints: (json['totalPoints'] as num?)?.toInt() ?? 0,
       currentStreak: (json['currentStreak'] as num?)?.toInt() ?? 0,
       lastActiveDate: json['lastActiveDate'] != null
@@ -73,6 +76,7 @@ class LocalProgress {
   }
 
   Map<String, dynamic> toJson() => {
+    'userName': userName,
     'totalPoints': totalPoints,
     'currentStreak': currentStreak,
     'lastActiveDate': lastActiveDate?.toIso8601String(),

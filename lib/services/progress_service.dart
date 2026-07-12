@@ -79,8 +79,9 @@ class ProgressService {
 
     // Check if the whole lesson is now complete
     final lesson = journey.lessons.firstWhere((l) => l.id == lessonId);
-    final allSectionsCompleted =
-        lesson.sections.every((s) => progress.completedSectionIds.contains(s.id));
+    final allSectionsCompleted = lesson.sections.every(
+      (s) => progress.completedSectionIds.contains(s.id),
+    );
 
     if (allSectionsCompleted) {
       progress.completedLessonIds.add(lessonId);
@@ -92,6 +93,15 @@ class ProgressService {
       }
     }
 
+    await _repository.save(progress);
+    return progress;
+  }
+
+  Future<LocalProgress> updateUserName(
+    LocalProgress progress,
+    String name,
+  ) async {
+    progress.userName = name.trim();
     await _repository.save(progress);
     return progress;
   }

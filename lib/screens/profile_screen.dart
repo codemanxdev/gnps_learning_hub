@@ -94,6 +94,7 @@ class ProfileScreen extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 24),
+              _NameField(currentName: progress.userName),
               Row(
                 children: [
                   Expanded(
@@ -229,6 +230,89 @@ class _StatCard extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _NameField extends ConsumerStatefulWidget {
+  final String? currentName;
+
+  const _NameField({required this.currentName});
+
+  @override
+  ConsumerState<_NameField> createState() => _NameFieldState();
+}
+
+class _NameFieldState extends ConsumerState<_NameField> {
+  bool _isEditing = false;
+  late final TextEditingController _controller = TextEditingController(
+    text: widget.currentName ?? '',
+  );
+  final FocusNode _focusNode = FocusNode();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  void _startEditing() {
+    setState(() => _isEditing = true);
+    FocusScope.of(context).requestFocus(_focusNode);
+  }
+
+  void _save() {
+    final name = _controller.text.trim();
+    if (name.isNotEmpty) {
+      ref.read(progressProvider.notifier).updateUserName(name);
+    } else {
+      _controller.text = widget.currentName ?? '';
+    }
+    setState(() => _isEditing = false);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_isEditing) {
+      return TextField(
+        controller: _controller,
+        focusNode: _focusNode,
+        autofocus: true,
+        textCapitalization: TextCapitalization.words,
+        decoration: const InputDecoration(
+          labelText: 'Your name',
+          border: OutlineInputBorder(),
+          isDense: true,
+        ),
+        onSubmitted: (_) => _save(),
+        onTapOutside: (_) => _save(),
+      );
+    }
+
+    final hasName =
+        widget.currentName != null && widget.currentName!.isNotEmpty;
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          hasName ? widget.currentName! : 'Add your name',
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: hasName ? null : Theme.of(context).colorScheme.outline,
+          ),
+        ),
+        const SizedBox(width: 6),
+        GestureDetector(
+          onTap: _startEditing,
+          child: Icon(
+            Icons.edit,
+            size: 18,
+            color: Theme.of(context).colorScheme.outline,
+          ),
+        ),
+      ],
     );
   }
 }
