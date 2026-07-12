@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
+import '../data/journey_data.dart';
 import '../models/journey.dart';
-import 'mock_journey_data.dart';
 
 class ContentRepository {
   static const _boxName = 'content_cache';
@@ -20,8 +20,8 @@ class ContentRepository {
     final cached = _box!.get(_journeyKey) as String?;
 
     if (cached == null) {
-      await _cacheJourney(mockJourney);
-      return mockJourney;
+      await _cacheJourney(journeyData);
+      return journeyData;
     }
 
     try {
@@ -29,17 +29,17 @@ class ContentRepository {
         jsonDecode(cached) as Map<String, dynamic>,
       );
 
-      if (mockJourney.version > cachedJourney.version) {
-        await _cacheJourney(mockJourney);
-        return mockJourney;
+      if (journeyData.version > cachedJourney.version) {
+        await _cacheJourney(journeyData);
+        return journeyData;
       }
 
       return cachedJourney;
     } catch (e) {
       // If cached data is corrupted or incompatible with new models,
       // overwrite it with the fresh mock data.
-      await _cacheJourney(mockJourney);
-      return mockJourney;
+      await _cacheJourney(journeyData);
+      return journeyData;
     }
   }
 
