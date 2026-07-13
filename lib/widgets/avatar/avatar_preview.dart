@@ -1,13 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../models/shop_item.dart';
 
-/// Renders a user's avatar in a tall, figure-like arrangement: turban up
-/// top (head), base body filling the center, clothes overlapping the
-/// lower half, and an accessory badge to the side. Since items are
-/// IconData + Color (not body-part artwork), this is a stylized layout
-/// rather than true anatomical layering — but it reads as "a figure"
-/// rather than a small icon cluster.
 class AvatarPreview extends StatelessWidget {
   final Map<String, String> equippedItemIds;
   final List<ShopItem> catalog;
@@ -25,6 +20,14 @@ class AvatarPreview extends StatelessWidget {
       if (item.id == itemId) return item;
     }
     return null;
+  }
+
+  // "None" sentinel items exist so the shop/equip system always has a
+  // valid default, but they shouldn't render a visible badge.
+  bool _isVisible(ShopItem? item) {
+    if (item == null) return false;
+    return item.id != DefaultItemIds.turbanNone &&
+        item.id != DefaultItemIds.accessoryNone;
   }
 
   @override
@@ -46,43 +49,50 @@ class AvatarPreview extends StatelessWidget {
         return Stack(
           alignment: Alignment.center,
           children: [
-            // Body — large, centered, dominates the canvas.
             Positioned(
               top: height * 0.14,
-              child: Container(
-                width: bodySize,
-                height: bodySize,
-                decoration: BoxDecoration(
-                  color: (base?.color ?? Colors.grey.shade300).withValues(
-                    alpha: 0.18,
-                  ),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  base?.icon ?? Icons.person,
-                  size: bodySize * 0.68,
-                  color: base?.color ?? Colors.grey.shade600,
-                ),
-              ),
+              child: base?.imageAssetPath != null
+                  ? SizedBox(
+                      width: bodySize,
+                      height: bodySize,
+                      child: SvgPicture.asset(
+                        base!.imageAssetPath!,
+                        fit: BoxFit.contain,
+                      ),
+                    )
+                  : Container(
+                      width: bodySize,
+                      height: bodySize,
+                      decoration: BoxDecoration(
+                        color: (base?.color ?? Colors.grey.shade300).withValues(
+                          alpha: 0.18,
+                        ),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        base?.icon ?? Icons.person,
+                        size: bodySize * 0.68,
+                        color: base?.color ?? Colors.grey.shade600,
+                      ),
+                    ),
             ),
-            // Turban — sits on top like a head-slot item.
-            if (turban != null)
+            if (_isVisible(turban))
               Positioned(
                 top: 0,
-                child: _SlotBadge(item: turban, size: turbanSize),
+                child: _SlotBadge(item: turban!, size: turbanSize),
               ),
-            // Clothes — overlaps the lower body.
+            // clothes_default is a real garment, not a "none" sentinel —
+            // it's meant to always render, so no visibility check here.
             if (clothes != null)
               Positioned(
                 bottom: height * 0.06,
                 child: _SlotBadge(item: clothes, size: clothesSize),
               ),
-            // Accessory — floats beside the body, like glasses/jewelry.
-            if (accessory != null)
+            if (_isVisible(accessory))
               Positioned(
                 top: height * 0.32,
                 right: width * 0.02,
-                child: _SlotBadge(item: accessory, size: accessorySize),
+                child: _SlotBadge(item: accessory!, size: accessorySize),
               ),
           ],
         );
@@ -99,6 +109,13 @@ class _SlotBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (item.imageAssetPath != null) {
+      return SizedBox(
+        width: size,
+        height: size,
+        child: SvgPicture.asset(item.imageAssetPath!, fit: BoxFit.contain),
+      );
+    }
     return Container(
       width: size,
       height: size,
