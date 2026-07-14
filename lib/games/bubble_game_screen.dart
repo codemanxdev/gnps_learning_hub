@@ -53,29 +53,13 @@ class _BubbleGameScreenState extends ConsumerState<BubbleGameScreen>
   }
 
   Future<void> _initGame() async {
-    final journey = await ref.read(journeyProvider.future);
-    final progress = ref.read(progressProvider).value;
-
-    if (progress == null) return;
-
-    final List<String> pool = [];
-    for (final lesson in journey.lessons) {
-      if (progress.completedLessonIds.contains(lesson.id)) {
-        for (final section in lesson.sections) {
-          for (final task in section.tasks) {
-            if (task.content['letter'] != null) {
-              pool.add(task.content['letter'] as String);
-            } else if (task.content['targetWord'] != null) {
-              final word = task.content['targetWord'] as String;
-              pool.addAll(word.split(''));
-            }
-          }
-        }
-      }
-    }
+    final content = widget.game.content;
+    final List<String> letters = (content['letters'] as List? ?? [])
+        .map((e) => e.toString())
+        .toList();
 
     setState(() {
-      _letterPool = pool.isEmpty ? ['ੳ', 'ਅ', 'ੲ', 'ਸ', 'ਹ'] : pool.toSet().toList();
+      _letterPool = letters.isEmpty ? ['ੳ', 'ਅ', 'ੲ', 'ਸ', 'ਹ'] : letters;
       _nextRound();
     });
 
@@ -161,9 +145,58 @@ class _BubbleGameScreenState extends ConsumerState<BubbleGameScreen>
     setState(() {
       _lives--;
       if (_lives <= 0) {
-        _gameOver = true;
+        _showGameOverOrContinue();
       }
     });
+  }
+
+  void _showGameOverOrContinue() {
+    final progress = ref.read(progressProvider).value;
+    final extraHearts = progress?.ownedItemQuantities['powerup_extra_life'] ?? 0;
+
+    if (extraHearts > 0) {
+      // Pause game
+      _spawnTimer.cancel();
+      // We don't cancel gameLoop to keep UI interactive if needed, 
+      // but we set _gameOver to true temporarily or use a different flag
+      _gameOver = true;
+      
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => AlertDialog(
+          title: const Text('Out of Hearts!'),
+          content: Text('You have $extraHearts Extra Hearts. Use one to get 3 more lives and continue?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                setState(() => _gameOver = true); // Final game over
+              },
+              child: const Text('No, Quit'),
+            ),
+            FilledButton(
+              onPressed: () async {
+                await ref.read(progressProvider.notifier).consumeItem('powerup_extra_life');
+                if (mounted) {
+                  Navigator.of(context).pop();
+                  setState(() {
+                    _lives = 3;
+                    _gameOver = false;
+                    _spawnTimer = Timer.periodic(Duration(milliseconds: _spawnRateMs), (timer) {
+                      if (!_gameOver) _spawnBubble();
+                    });
+                  });
+                }
+              },
+              child: const Text('Use 1 Heart'),
+            ),
+          ],
+        ),
+      );
+    } else {
+      setState(() => _gameOver = true);
+    }
   }
 
   void _winGame() {
@@ -219,11 +252,37 @@ class _BubbleGameScreenState extends ConsumerState<BubbleGameScreen>
                           onPressed: () => Navigator.of(context).pop(),
                         ),
                         Row(
-                          children: List.generate(3, (index) => Icon(
-                            index < _lives ? Icons.favorite : Icons.favorite_border,
-                            color: Colors.red,
-                            size: 32,
-                          )),
+                          children: [
+                            ...List.generate(3, (index) => Icon(
+                              index < _lives ? Icons.favorite : Icons.favorite_border,
+                              color: Colors.red,
+                              size: 32,
+                            )),
+                            const SizedBox(width: 8),
+                            if ((ref.watch(progressProvider).value?.ownedItemQuantities['powerup_extra_life'] ?? 0) > 0)
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: Colors.red.withValues(alpha: 0.1),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(color: Colors.red.withValues(alpha: 0.3)),
+                                ),
+                                child: Row(
+                                  children: [
+                                    const Icon(Icons.add, size: 16, color: Colors.red),
+                                    const Icon(Icons.favorite, size: 16, color: Colors.red),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      '${ref.watch(progressProvider).value?.ownedItemQuantities['powerup_extra_life']}',
+                                      style: const TextStyle(
+                                        color: Colors.red,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                          ],
                         ),
                         Text(
                           'Score: $_score',

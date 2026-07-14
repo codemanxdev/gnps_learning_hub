@@ -193,6 +193,21 @@ class ProgressNotifier extends StateNotifier<AsyncValue<LocalProgress>> {
     state = AsyncValue.data(updated);
   }
 
+  Future<void> consumeItem(String itemId) async {
+    await _initialLoad;
+    final current = state.value;
+    if (current == null) return;
+
+    final count = current.ownedItemQuantities[itemId] ?? 0;
+    if (count <= 0) return;
+
+    final updated = LocalProgress.fromJson(current.toJson());
+    updated.ownedItemQuantities[itemId] = count - 1;
+
+    await _repository.save(updated);
+    state = AsyncValue.data(updated);
+  }
+
   Future<void> completeOnboarding() async {
     await _initialLoad;
     final current = state.value;

@@ -9,10 +9,18 @@ final Map<String, dynamic> bubbleGameConfig = {
   'iconName': 'bubble',
   'colorValue': 0xFF2196F3, // Colors.blue
   'content': {
-    'pool': 'lessons',
-    'spawnRateMs': 1200,
-    'minSpeed': 1.5,
-    'maxSpeed': 3.5,
+    'spawnRateMs': 800,
+    'minSpeed': 1.0,
+    'maxSpeed': 2.5,
     'bubbleSize': 120.0,
+    'letters': [
+      'ੳ', 'ਅ', 'ੲ', 'ਸ', 'ਹ',
+      'ਕ', 'ਖ', 'ਗ', 'ਘ', 'ਙ',
+      'ਚ', 'ਛ', 'ਜ', 'ਝ', 'ਞ',
+      'ਟ', 'ਠ', 'ਡ', 'ਢ', 'ਣ',
+      'ਤ', 'ਥ', 'ਦ', 'ਧ', 'ਨ',
+      'ਪ', 'ਫ', 'ਬ', 'ਭ', 'ਮ',
+      'ਯ', 'ਰ', 'ਲ', 'ਵ', 'ੜ'
+    ],
   },
 };

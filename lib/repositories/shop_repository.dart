@@ -93,5 +93,15 @@ class ShopRepository {
       category: ShopItemCategory.powerUp,
       stackable: true,
     ),
+    ShopItem(
+      id: 'powerup_extra_life',
+      name: 'Extra Heart',
+      description: 'Gives you an extra life in games.',
+      icon: Icons.favorite,
+      color: Colors.red,
+      price: 20,
+      category: ShopItemCategory.powerUp,
+      stackable: true,
+    ),
   ];
 }
