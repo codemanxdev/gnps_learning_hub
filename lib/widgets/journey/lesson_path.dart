@@ -273,8 +273,8 @@ class LessonPath extends StatelessWidget {
                       title: game.title,
                       isLocked: !isUnlocked,
                       onTap: () => onTapGame?.call(game),
-                      icon: _getIconFor(game.iconName),
-                      color: game.colorValue != null ? Color(game.colorValue!) : Colors.amber,
+                      icon: game.icon ?? Icons.videogame_asset,
+                      color: game.color ?? Colors.amber,
                     ),
                   );
                 }),
@@ -284,15 +284,5 @@ class LessonPath extends StatelessWidget {
         );
       },
     );
-  }
-
-  IconData _getIconFor(String? name) {
-    switch (name) {
-      case 'bubble': return Icons.blur_on;
-      case 'spell': return Icons.abc;
-      case 'match': return Icons.extension;
-      case 'game': return Icons.videogame_asset;
-      default: return Icons.videogame_asset;
-    }
   }
 }

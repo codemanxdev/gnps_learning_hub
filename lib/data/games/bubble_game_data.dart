@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 /// Configuration for the "Letter Bubbles" game.
 final Map<String, dynamic> bubbleGameConfig = {
   'id': 'bubble_pop_letters',
@@ -6,8 +8,8 @@ final Map<String, dynamic> bubbleGameConfig = {
   'type': 'bubble_pop',
   'mapXOffset': 150.0,
   'mapYOffset': 80.0,
-  'iconName': 'bubble',
-  'colorValue': 0xFF2196F3, // Colors.blue
+  'icon': Icons.videogame_asset,
+  'color': const Color(0xFF00BCD4), // Cyan/Teal (Magic Blue)
   'content': {
     'spawnRateMs': 800,
     'minSpeed': 1.0,

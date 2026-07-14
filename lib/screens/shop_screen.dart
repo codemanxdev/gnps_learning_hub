@@ -88,7 +88,7 @@ class _ShopContent extends ConsumerWidget {
               physics: const NeverScrollableScrollPhysics(),
               mainAxisSpacing: 12,
               crossAxisSpacing: 12,
-              childAspectRatio: 0.85,
+              childAspectRatio: 0.75,
               children: [
                 for (final item in purchasableCatalog.where(
                   (i) => i.category == category,
@@ -171,45 +171,58 @@ class _ShopItemCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           item.imageAssetPath != null
-              ? SvgPicture.asset(item.imageAssetPath!, width: 56, height: 56)
-              : Icon(item.icon, color: item.color, size: 56),
+              ? SvgPicture.asset(item.imageAssetPath!, width: 52, height: 52)
+              : Icon(item.icon, color: item.color, size: 52),
           const SizedBox(height: 8),
-          Text(
-            item.name,
-            textAlign: TextAlign.center,
-            style: Theme.of(
-              context,
-            ).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            item.description,
-            textAlign: TextAlign.center,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: Theme.of(
-              context,
-            ).textTheme.bodySmall?.copyWith(color: Colors.grey.shade600),
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  item.name,
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  item.description,
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(color: Colors.grey.shade600),
+                ),
+              ],
+            ),
           ),
           const SizedBox(height: 8),
           if (item.stackable && quantity > 0)
-            Text(
-              'Owned: $quantity',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Colors.green.shade700,
-                fontWeight: FontWeight.w600,
+            Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: Text(
+                'Owned: $quantity',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Colors.green.shade700,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
-          const SizedBox(height: 4),
           SizedBox(
             width: double.infinity,
             child: isSoldOut
                 ? const OutlinedButton(onPressed: null, child: Text('Owned'))
                 : ElevatedButton(
                     onPressed: canAfford ? onBuy : null,
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                    ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       mainAxisSize: MainAxisSize.min,

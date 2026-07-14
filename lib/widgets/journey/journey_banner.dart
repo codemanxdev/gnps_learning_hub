@@ -11,8 +11,14 @@ import '../../widgets/avatar/avatar_preview.dart';
 class JourneyBanner extends ConsumerWidget {
   final int streak;
   final int points;
+  final int hearts;
 
-  const JourneyBanner({super.key, required this.streak, required this.points});
+  const JourneyBanner({
+    super.key,
+    required this.streak,
+    required this.points,
+    required this.hearts,
+  });
 
   void _openStreakScreen(BuildContext context) {
     Navigator.of(
@@ -68,6 +74,12 @@ class JourneyBanner extends ConsumerWidget {
           ),
           Row(
             children: [
+              _StatPill(
+                icon: Icons.favorite,
+                color: Colors.red,
+                value: '$hearts',
+              ),
+              const SizedBox(width: 10),
               GestureDetector(
                 onTap: () => _openStreakScreen(context),
                 child: _StatPill(
@@ -76,7 +88,7 @@ class JourneyBanner extends ConsumerWidget {
                   value: '$streak',
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 10),
               _StatPill(
                 icon: RewardConfig.icon,
                 color: RewardConfig.color,

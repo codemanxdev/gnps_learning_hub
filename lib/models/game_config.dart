@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 class GameConfig {
   final String id;
   final String title;
@@ -6,8 +8,8 @@ class GameConfig {
   final Map<String, dynamic> content;
   final double? mapXOffset; // Horizontal offset from the anchor lesson
   final double? mapYOffset; // Vertical offset from the anchor lesson
-  final String? iconName;
-  final int? colorValue;
+  final IconData? icon;
+  final Color? color;
 
   const GameConfig({
     required this.id,
@@ -17,8 +19,8 @@ class GameConfig {
     this.content = const {},
     this.mapXOffset,
     this.mapYOffset,
-    this.iconName,
-    this.colorValue,
+    this.icon,
+    this.color,
   });
 
   factory GameConfig.fromJson(Map<String, dynamic> json) {
@@ -30,8 +32,10 @@ class GameConfig {
       content: Map<String, dynamic>.from(json['content'] as Map? ?? {}),
       mapXOffset: (json['mapXOffset'] as num?)?.toDouble(),
       mapYOffset: (json['mapYOffset'] as num?)?.toDouble(),
-      iconName: json['iconName'] as String?,
-      colorValue: (json['colorValue'] as num?)?.toInt(),
+      icon: json['icon'] as IconData?,
+      color: json['color'] is int 
+          ? Color(json['color'] as int) 
+          : json['color'] as Color?,
     );
   }
 
@@ -43,7 +47,7 @@ class GameConfig {
     'content': content,
     'mapXOffset': mapXOffset,
     'mapYOffset': mapYOffset,
-    'iconName': iconName,
-    'colorValue': colorValue,
+    'icon': icon,
+    'color': color,
   };
 }

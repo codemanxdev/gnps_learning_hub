@@ -111,6 +111,7 @@ class _JourneyContent extends StatelessWidget {
         JourneyBanner(
           streak: progress.currentStreak,
           points: progress.totalPoints,
+          hearts: progress.ownedItemQuantities['powerup_extra_life'] ?? 0,
         ),
         Expanded(
           child: LessonPath(
