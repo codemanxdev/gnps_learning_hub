@@ -207,7 +207,7 @@ class LessonPath extends StatelessWidget {
             _verticalSpacing * (lessons.length - 1) +
             _nodeSize +
             _topPadding +
-            100;
+            200; // Increased buffer to prevent clipping of scenery/games
         final viewHeight = max(constraints.maxHeight, contentHeight);
 
         return SingleChildScrollView(

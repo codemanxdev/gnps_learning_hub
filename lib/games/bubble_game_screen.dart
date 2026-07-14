@@ -299,7 +299,12 @@ class _BubbleGameScreenState extends ConsumerState<BubbleGameScreen>
                       ),
                       child: Column(
                         children: [
-                          const Text('Find the letter:', style: TextStyle(fontSize: 18)),
+                          Text(
+                            widget.game.id.contains('word') 
+                                ? 'Find the word:' 
+                                : 'Find the letter:', 
+                            style: const TextStyle(fontSize: 18),
+                          ),
                           Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
@@ -406,13 +411,21 @@ class _BubbleWidget extends StatelessWidget {
         border: Border.all(color: Colors.white.withValues(alpha: 0.5), width: 2),
       ),
       child: Center(
-        child: Text(
-          bubble.letter,
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: bubble.size * 0.5,
-            fontWeight: FontWeight.bold,
-            shadows: const [Shadow(color: Colors.black26, blurRadius: 4)],
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(
+            bubble.letter,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: bubble.letter.length > 3 
+                  ? bubble.size * 0.25 
+                  : bubble.letter.length > 1 
+                      ? bubble.size * 0.35 
+                      : bubble.size * 0.5,
+              fontWeight: FontWeight.bold,
+              shadows: const [Shadow(color: Colors.black26, blurRadius: 4)],
+            ),
           ),
         ),
       ),

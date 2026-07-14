@@ -5,6 +5,7 @@ import 'lessons/lesson_matching.dart';
 import 'lessons/lesson_fill_in_the_blanks.dart';
 import 'lessons/lesson_arrange_sentence.dart';
 import 'games/bubble_game_data.dart';
+import 'games/word_bubble_game_data.dart';
 
 /// The app's bundled lesson content, packaged locally rather than fetched
 /// from a backend. This is the real content source — not placeholder data.
@@ -40,5 +41,6 @@ final Journey journeyData = Journey.fromJson({
   ],
   'games': [
     bubbleGameConfig,
+    wordBubbleGameConfig,
   ],
 });
