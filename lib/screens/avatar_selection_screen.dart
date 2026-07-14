@@ -109,10 +109,11 @@ class _AvatarSelectionScreenState extends ConsumerState<AvatarSelectionScreen> {
                       await notifier.equipItem(avatar);
                       await notifier.completeOnboarding();
                       if (context.mounted) {
-                        Navigator.of(context).pushReplacement(
+                        Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
                             builder: (_) => const JourneyScreen(),
                           ),
+                          (route) => false,
                         );
                       }
                     },
