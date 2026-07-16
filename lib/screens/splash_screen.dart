@@ -31,7 +31,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
         .ensureFirstLessonUnlocked(journey);
 
     // After "Ready!" is shown (via JourneyReady state), wait a brief moment before transitioning.
-    await Future.delayed(const Duration(milliseconds: 800));
+    await Future.delayed(const Duration(milliseconds: 400));
 
     if (mounted) {
       final progress = ref.read(progressProvider).value;

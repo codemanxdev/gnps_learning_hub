@@ -65,13 +65,19 @@ class JourneySyncNotifier extends StateNotifier<JourneySyncState> {
       toVersion: remoteVersion,
     );
 
+    final minimumInstallingTime = Future.delayed(
+      const Duration(milliseconds: 400),
+    );
+
     try {
       final installed = await _repository.fetchAndCacheRemoteJourney(
         remoteVersion,
       );
+      await minimumInstallingTime;
       state = JourneyReady(journey: installed, wasUpdated: true);
       _readyCompleter.complete(installed);
     } catch (_) {
+      await minimumInstallingTime;
       state = JourneyReady(journey: local, wasUpdated: false);
       _readyCompleter.complete(local);
     }
