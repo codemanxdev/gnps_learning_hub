@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../data/journey_data.dart';
 import '../models/journey.dart';
 import '../repositories/content_repository.dart';
 
@@ -49,7 +50,24 @@ class JourneySyncNotifier extends StateNotifier<JourneySyncState> {
     // Add a small artificial delay so the "Checking for updates" status is actually visible.
     final minimumCheckingTime = Future.delayed(const Duration(milliseconds: 2400));
 
-    final local = await _repository.getLocalJourney();
+    var local = await _repository.getLocalJourney();
+
+    // If the bundled code has a newer version than the cache (e.g. after an app update),
+    // show the "Installing" status and migrate the cache.
+    if (journeyData.version > local.version) {
+      await minimumCheckingTime;
+      state = JourneyInstallingUpdate(
+        fromVersion: local.version,
+        toVersion: journeyData.version,
+      );
+
+      final minInstalling = Future.delayed(const Duration(milliseconds: 400));
+      await _repository.cacheJourney(journeyData);
+      await minInstalling;
+
+      local = journeyData;
+    }
+
     final remoteVersion = await _repository.fetchRemoteVersion();
 
     if (remoteVersion == null || remoteVersion <= local.version) {

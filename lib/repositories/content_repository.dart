@@ -20,30 +20,19 @@ class ContentRepository {
     final cached = _box!.get(_journeyKey) as String?;
 
     if (cached == null) {
-      await _cacheJourney(journeyData);
       return journeyData;
     }
 
     try {
-      final cachedJourney = Journey.fromJson(
+      return Journey.fromJson(
         jsonDecode(cached) as Map<String, dynamic>,
       );
-
-      if (journeyData.version > cachedJourney.version) {
-        await _cacheJourney(journeyData);
-        return journeyData;
-      }
-
-      return cachedJourney;
     } catch (e) {
-      // If cached data is corrupted or incompatible with new models,
-      // overwrite it with the fresh mock data.
-      await _cacheJourney(journeyData);
       return journeyData;
     }
   }
 
-  Future<void> _cacheJourney(Journey journey) async {
+  Future<void> cacheJourney(Journey journey) async {
     await _ensureBox();
     await _box!.put(_journeyKey, jsonEncode(journey.toJson()));
   }
@@ -78,7 +67,7 @@ class ContentRepository {
       'lessons': lessonsSnapshot.docs.map((d) => d.data()).toList(),
     });
 
-    await _cacheJourney(remoteJourney);
+    await cacheJourney(remoteJourney);
     return remoteJourney;
   }
 
@@ -86,16 +75,24 @@ class ContentRepository {
   /// don't care about the intermediate "checking" / "installing" steps.
   Future<Journey> checkForUpdatesAndSync() async {
     final local = await getLocalJourney();
+
+    // If bundled data is newer than cache, use that as the new baseline.
+    var current = local;
+    if (journeyData.version > local.version) {
+      await cacheJourney(journeyData);
+      current = journeyData;
+    }
+
     final remoteVersion = await fetchRemoteVersion();
 
-    if (remoteVersion == null || remoteVersion <= local.version) {
-      return local;
+    if (remoteVersion == null || remoteVersion <= current.version) {
+      return current;
     }
 
     try {
       return await fetchAndCacheRemoteJourney(remoteVersion);
     } catch (_) {
-      return local;
+      return current;
     }
   }
 
