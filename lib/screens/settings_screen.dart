@@ -126,14 +126,7 @@ class SettingsScreen extends ConsumerWidget {
               },
             ),
             const Divider(height: 32),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text('Theme color'),
-              ),
-            ),
-            const SizedBox(height: 12),
+            const _SectionHeader('Theme color'),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Wrap(
@@ -168,17 +161,7 @@ class SettingsScreen extends ConsumerWidget {
               ),
             ),
             const Divider(height: 32),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'About',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-            ),
-            const SizedBox(height: 8),
+            const _SectionHeader('About'),
             FutureBuilder<PackageInfo>(
               future: PackageInfo.fromPlatform(),
               builder: (context, snapshot) {
@@ -220,17 +203,7 @@ class SettingsScreen extends ConsumerWidget {
             ),
             if (kDebugMode) ...[
               const Divider(height: 32),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Debug Tools',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
+              const _SectionHeader('Debug Tools'),
               _SettingsActionButton(
                 onPressed: () => _debugCompleteAllLessons(context, ref),
                 icon: Icons.done_all,
@@ -251,6 +224,26 @@ class SettingsScreen extends ConsumerWidget {
         ),
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Error loading settings: $e')),
+      ),
+    );
+  }
+}
+
+class _SectionHeader extends StatelessWidget {
+  final String title;
+
+  const _SectionHeader(this.title);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+      child: Text(
+        title,
+        style: Theme.of(context).textTheme.titleSmall?.copyWith(
+              color: Theme.of(context).colorScheme.primary,
+              fontWeight: FontWeight.bold,
+            ),
       ),
     );
   }
