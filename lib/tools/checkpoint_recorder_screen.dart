@@ -107,7 +107,9 @@ class _CheckpointRecorderScreenState extends State<CheckpointRecorderScreen> {
   void _showExportDialog() {
     final snippet = _buildExportSnippet();
     if (snippet.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      final messenger = ScaffoldMessenger.of(context);
+      messenger.clearSnackBars();
+      messenger.showSnackBar(
         const SnackBar(
           content: Text('Tap some checkpoints on the letter first.'),
         ),
@@ -129,7 +131,9 @@ class _CheckpointRecorderScreenState extends State<CheckpointRecorderScreen> {
           TextButton(
             onPressed: () {
               Clipboard.setData(ClipboardData(text: snippet));
-              ScaffoldMessenger.of(context).showSnackBar(
+              final messenger = ScaffoldMessenger.of(context);
+              messenger.clearSnackBars();
+              messenger.showSnackBar(
                 const SnackBar(content: Text('Copied to clipboard')),
               );
             },

@@ -54,9 +54,9 @@ class _ShopContent extends ConsumerWidget {
       PurchaseResult.alreadyOwned => 'You already own ${item.name}.',
     };
 
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(message)));
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.clearSnackBars();
+    messenger.showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override

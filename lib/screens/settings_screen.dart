@@ -91,7 +91,9 @@ class SettingsScreen extends ConsumerWidget {
     await ref.read(progressProvider.notifier).debugCompleteAllLessons(journey);
 
     if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      final messenger = ScaffoldMessenger.of(context);
+      messenger.clearSnackBars();
+      messenger.showSnackBar(
         const SnackBar(content: Text('All lessons marked complete (debug).')),
       );
     }
