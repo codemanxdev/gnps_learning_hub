@@ -1,14 +1,22 @@
 <svg width="400" height="500" viewBox="0 0 400 500" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Suit Jacket (Slightly broader than default torso to mask it) -->
-  <path d="M100 240C100 190 142 140 200 140C258 140 300 190 300 240V492C300 496 296 500 292 500H108C104 500 100 496 100 492V240Z" fill="#222222"/>
+  <!-- Suit Jacket (Ensuring zero gaps at shoulders) -->
+  <g>
+    <!-- Sleeves (Charcoal, slightly wider at shoulder for overlap) -->
+    <path d="M110 270 Q60 280 45 370 Q35 430 40 500 H115 V270 Z" fill="#1A1A1A"/>
+    <path d="M290 270 Q340 280 355 370 Q365 430 360 500 H285 V270 Z" fill="#1A1A1A"/>
+    <!-- Jacket Body -->
+    <path d="M100 310 C100 270 142 260 200 260 C258 260 300 270 300 310 V495 C300 498 298 500 295 500 H105 C102 500 100 498 100 495V310Z" fill="#222222"/>
+  </g>
 
-  <!-- Shirt/Collar (centered at y=150-160 area) -->
-  <path d="M200 140L150 140L180 180L200 140Z" fill="#FFFFFF"/>
-  <path d="M200 140L250 140L220 180L200 140Z" fill="#FFFFFF"/>
+  <!-- Shirt/Collar -->
+  <path d="M200 260 L160 260 L185 300 L200 260 Z" fill="#FFFFFF"/>
+  <path d="M200 260 L240 260 L215 300 L200 260 Z" fill="#FFFFFF"/>
 
   <!-- Red Tie -->
-  <path d="M200 140L190 150V210L200 230L210 210V150L200 140Z" fill="#C62828"/>
+  <path d="M200 260 L192 270 V330 L200 350 L208 330 V270 L200 260 Z" fill="#C62828"/>
 
-  <!-- Lapel Shading -->
-  <path d="M100 240C100 210 112 170 152 170L200 210L248 170C288 170 300 210 300 240" stroke="#444444" stroke-width="4"/>
+  <!-- Lapel Detail & Shading -->
+  <path d="M100 310 C100 280 115 260 160 260 L200 300 L240 260 C285 260 300 280 300 310" stroke="#333333" stroke-width="4"/>
+  <circle cx="192" cy="400" r="3" fill="#111111"/>
+  <circle cx="192" cy="440" r="3" fill="#111111"/>
 </svg>

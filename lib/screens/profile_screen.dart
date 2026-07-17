@@ -216,10 +216,12 @@ class _NameFieldState extends ConsumerState<_NameField> {
         focusNode: _focusNode,
         autofocus: true,
         textCapitalization: TextCapitalization.words,
+        maxLength: 20,
         decoration: const InputDecoration(
           labelText: 'Your name',
           border: OutlineInputBorder(),
           isDense: true,
+          counterText: "",
         ),
         onSubmitted: (_) => _save(),
         onTapOutside: (_) => _save(),
@@ -231,12 +233,17 @@ class _NameFieldState extends ConsumerState<_NameField> {
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Text(
-          hasName ? widget.currentName! : 'Add your name',
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: hasName ? null : Theme.of(context).colorScheme.outline,
+        Flexible(
+          child: Text(
+            hasName ? widget.currentName! : 'Add your name',
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: hasName ? null : Theme.of(context).colorScheme.outline,
+            ),
           ),
         ),
         const SizedBox(width: 6),

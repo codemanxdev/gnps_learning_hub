@@ -1,28 +1,49 @@
 <svg width="400" height="500" viewBox="0 0 400 500" xmlns="http://www.w3.org/2000/svg" role="img">
-  <title>Sikh girl avatar (Default)</title>
+  <title>Sikh girl avatar (Default High Detail)</title>
 
-  <!-- DEFAULT: Pink Dress (torso) -->
-  <path d="M108 240C108 190 150 150 200 150C250 150 292 190 292 240V480H108V240Z" fill="#D4537E"/>
+  <!-- DEFAULT: Pink Kurti with Realistic Arms & Shading -->
+  <g>
+    <!-- Left Arm & Sleeve (Ensuring overlap) -->
+    <path d="M130 280 Q90 285 75 360 Q60 420 65 480 H130 V280 Z" fill="#B33F67"/>
+    <!-- Right Arm & Sleeve (Ensuring overlap) -->
+    <path d="M270 280 Q310 285 325 360 Q340 420 335 480 H270 V280 Z" fill="#B33F67"/>
+
+    <!-- Kurti Body -->
+    <path d="M120 310 C120 270 145 260 200 260 C255 260 280 270 280 310 C280 350 260 380 260 410 V500 H140 V410 C140 380 120 350 120 310 Z" fill="#D4537E"/>
+
+    <!-- V-Neck Embroidery Detail -->
+    <path d="M200 260 L170 260 Q200 300 230 260 L200 260 Z" fill="#FCE4EC" fill-opacity="0.3"/>
+    <path d="M185 270 Q200 285 215 270" fill="none" stroke="#FCE4EC" stroke-width="2" stroke-linecap="round"/>
+
+    <!-- Fabric Folds -->
+    <path d="M140 430 Q200 440 260 430" fill="none" stroke="black" stroke-opacity="0.05" stroke-width="3"/>
+    <path d="M150 460 Q200 470 250 460" fill="none" stroke="black" stroke-opacity="0.05" stroke-width="3"/>
+  </g>
 
   <!-- Base: Skin & Face -->
   <circle cx="80" cy="164" r="18" fill="#F2C9A0"/> <!-- Left Ear -->
   <circle cx="320" cy="164" r="18" fill="#F2C9A0"/> <!-- Right Ear -->
-  <circle cx="200" cy="164" r="124" fill="#F2C9A0"/> <!-- Face Circle -->
+  <circle cx="200" cy="164" r="124" fill="#F2C9A0"/> <!-- Face -->
+
+  <!-- Facial Features -->
+  <!-- Eyebrows -->
+  <path d="M145 150 Q160 142 175 150" fill="none" stroke="#2B2118" stroke-width="3" stroke-linecap="round"/>
+  <path d="M225 150 Q240 142 255 150" fill="none" stroke="#2B2118" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- Eyes -->
+  <circle cx="160" cy="164" r="16" fill="#fff" stroke="#2B2118" stroke-width="3"/>
+  <circle cx="160" cy="164" r="8" fill="#2B2118"/>
+  <circle cx="240" cy="164" r="16" fill="#fff" stroke="#2B2118" stroke-width="3"/>
+  <circle cx="240" cy="164" r="8" fill="#2B2118"/>
+
+  <!-- Mouth -->
+  <path d="M156 218 Q200 250 244 218" fill="none" stroke="#8D4B3B" stroke-width="8" stroke-linecap="round"/>
 
   <!-- DEFAULT: Orange Chunni (Built-in) -->
   <g>
-    <!-- Side Drapes -->
-    <path d="M60 120 Q40 240 76 296 Q92 304 88 260 Q80 200 84 130 Z" fill="#EF9F27"/>
-    <path d="M340 120 Q360 240 324 296 Q308 304 312 260 Q320 200 316 130 Z" fill="#EF9F27"/>
-    <!-- Top Cover -->
-    <path d="M72 152 Q60 28 200 16 Q340 28 328 152 Q336 60 200 44 Q64 60 72 152 Z" fill="#EF9F27"/>
-    <path d="M72 124 Q200 64 328 124 L328 100 Q200 44 72 100 Z" fill="#BA7517"/>
+    <path d="M60 120 Q40 240 76 296 Q92 304 88 260 Q80 200 84 130 Z" fill="#EF9F27"/> <!-- Left drape -->
+    <path d="M340 120 Q360 240 324 296 Q308 304 312 260 Q320 200 316 130 Z" fill="#EF9F27"/> <!-- Right drape -->
+    <path d="M72 152 Q60 28 200 16 Q340 28 328 152 Q336 60 200 44 Q64 60 72 152 Z" fill="#EF9F27"/> <!-- Top -->
+    <path d="M72 124 Q200 64 328 124 L328 100 Q200 44 72 100 Z" fill="#BA7517"/> <!-- Inner shade -->
   </g>
-
-  <!-- Features -->
-  <circle cx="160" cy="164" r="16" fill="#fff" stroke="#2B2118" stroke-width="3"/> <!-- Left Eye -->
-  <circle cx="160" cy="164" r="8" fill="#2B2118"/>
-  <circle cx="240" cy="164" r="16" fill="#fff" stroke="#2B2118" stroke-width="3"/> <!-- Right Eye -->
-  <circle cx="240" cy="164" r="8" fill="#2B2118"/>
-  <path d="M156 218 Q200 250 244 218" fill="none" stroke="#8D4B3B" stroke-width="8" stroke-linecap="round"/> <!-- Mouth -->
 </svg>

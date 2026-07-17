@@ -1,35 +1,63 @@
 <svg width="400" height="500" viewBox="0 0 400 500" xmlns="http://www.w3.org/2000/svg" role="img">
-  <title>Sikh boy avatar (Default)</title>
+  <title>Sikh boy avatar (Default High Detail)</title>
 
-  <!-- DEFAULT: Blue Kurta/Shirt (torso) -->
-  <path d="M108 240C108 190 150 150 200 150C250 150 292 190 292 240V480H108V240Z" fill="#3E7FB8"/>
+  <!-- DEFAULT: Blue Kurta with Realistic Arms & Shading -->
+  <g>
+    <!-- Left Arm & Sleeve (Ensuring overlap with shoulder) -->
+    <path d="M120 280 Q80 285 55 380 Q45 440 50 480 H115 V280 Z" fill="#2E608C"/>
+    <!-- Right Arm & Sleeve (Ensuring overlap with shoulder) -->
+    <path d="M280 280 Q320 285 345 380 Q355 440 350 480 H285 V280 Z" fill="#2E608C"/>
+
+    <!-- Kurta Body -->
+    <path d="M110 320 C110 270 140 260 200 260 C260 260 290 270 290 320 V490 C290 496 286 500 280 500 H120 C114 500 110 496 110 490 V320 Z" fill="#3E7FB8"/>
+
+    <!-- Placket & Buttons -->
+    <path d="M195 260 H205 V380 H195 Z" fill="#2E608C" fill-opacity="0.3"/>
+    <circle cx="200" cy="300" r="4" fill="#FFFFFF" fill-opacity="0.6"/>
+    <circle cx="200" cy="325" r="4" fill="#FFFFFF" fill-opacity="0.6"/>
+    <circle cx="200" cy="350" r="4" fill="#FFFFFF" fill-opacity="0.6"/>
+
+    <!-- Fabric Folds -->
+    <path d="M110 350 Q130 360 140 350" fill="none" stroke="black" stroke-opacity="0.05" stroke-width="2"/>
+    <path d="M290 350 Q270 360 260 350" fill="none" stroke="black" stroke-opacity="0.05" stroke-width="2"/>
+
+    <!-- Collar -->
+    <path d="M200 260 L175 260 L190 290 L200 260 Z" fill="#5A9AD4" fill-opacity="0.5"/>
+    <path d="M200 260 L225 260 L210 290 L200 260 Z" fill="#5A9AD4" fill-opacity="0.5"/>
+  </g>
 
   <!-- Base: Skin & Face -->
   <circle cx="80" cy="164" r="20" fill="#E8B786"/> <!-- Left Ear -->
   <circle cx="320" cy="164" r="20" fill="#E8B786"/> <!-- Right Ear -->
-  <circle cx="200" cy="164" r="124" fill="#E8B786"/> <!-- Face Circle -->
+  <circle cx="200" cy="164" r="124" fill="#E8B786"/> <!-- Face -->
 
-  <!-- Features -->
-  <path d="M110 156 Q104 60 200 50 Q296 60 290 156 Q296 120 200 116 Q104 120 110 156 Z" fill="#2B2118"/> <!-- Hair -->
-  <circle cx="160" cy="164" r="16" fill="#fff" stroke="#2B2118" stroke-width="3"/> <!-- Left Eye -->
+  <!-- Facial Features -->
+  <!-- Eyebrows -->
+  <path d="M140 145 Q160 135 180 145" fill="none" stroke="#2B2118" stroke-width="6" stroke-linecap="round"/>
+  <path d="M220 145 Q240 135 260 145" fill="none" stroke="#2B2118" stroke-width="6" stroke-linecap="round"/>
+
+  <!-- Eyes -->
+  <circle cx="160" cy="164" r="16" fill="#fff" stroke="#2B2118" stroke-width="3"/>
   <circle cx="160" cy="164" r="8" fill="#2B2118"/>
-  <circle cx="240" cy="164" r="16" fill="#fff" stroke="#2B2118" stroke-width="3"/> <!-- Right Eye -->
+  <circle cx="240" cy="164" r="16" fill="#fff" stroke="#2B2118" stroke-width="3"/>
   <circle cx="240" cy="164" r="8" fill="#2B2118"/>
-  <path d="M156 218 Q200 250 244 218" fill="none" stroke="#8D4B3B" stroke-width="8" stroke-linecap="round"/> <!-- Mouth -->
+
+  <!-- Nose Bridge Hint -->
+  <path d="M195 170 Q200 165 205 170" fill="none" stroke="black" stroke-opacity="0.05" stroke-width="2"/>
+
+  <!-- Mouth -->
+  <path d="M156 218 Q200 250 244 218" fill="none" stroke="#8D4B3B" stroke-width="8" stroke-linecap="round"/>
 
   <!-- DEFAULT: Blue Turban (Built-in) -->
   <g>
-    <!-- Fifty -->
-    <path d="M184 110L200 80L216 110H184Z" fill="#2E608C"/>
-    <!-- Base Silhouette -->
-    <path d="M84 104C84 30 130 0 200 0C270 0 316 30 316 104V124H84V104Z" fill="#3E7FB8"/>
-    <!-- Layers -->
-    <path d="M84 104C84 104 130 70 200 70C270 70 316 104 316 104V124H84V104Z" fill="#2E608C"/>
-    <path d="M316 104C316 104 300 40 200 40C140 40 90 70 90 100L84 104L200 70L316 104Z" fill="#3E7FB8"/>
-    <path d="M84 104C84 104 100 40 200 40C260 40 310 70 310 100L316 104L200 70L84 104Z" fill="#2E608C"/>
+    <path d="M184 110 L200 80 L216 110 H184 Z" fill="#2E608C"/> <!-- Fifty -->
+    <path d="M84 104 C84 30 130 0 200 0 C270 0 316 30 316 104 V124 H84 V104 Z" fill="#3E7FB8"/>
+    <!-- Detail Pechas -->
+    <path d="M84 104 C84 104 130 70 200 70 C270 70 316 104 316 104 V124 H84 V104 Z" fill="#2E608C"/>
+    <path d="M316 104 C316 104 300 40 200 40 C140 40 90 70 90 100 L84 104 L200 70 L316 104 Z" fill="#3E7FB8"/>
+    <path d="M84 104 C84 104 100 40 200 40 C260 40 310 70 310 100 L316 104 L200 70 L84 104 Z" fill="#2E608C"/>
     <!-- Nok -->
-    <path d="M200 0C200 0 176 6 176 26C176 46 200 60 200 60C200 60 224 46 224 26C224 6 200 0 200 0Z" fill="#5A9AD4"/>
-    <!-- Shadow -->
-    <path d="M200 60C196 80 196 120 200 154H202C206 120 206 80 202 60L200 60Z" fill="black" fill-opacity="0.1"/>
+    <path d="M200 0 C200 0 176 6 176 26 C176 46 200 60 200 60 C200 60 224 46 224 26 C224 6 200 0 200 0Z" fill="#5A9AD4"/>
+    <path d="M200 60 C196 80 196 120 200 154 H202 C206 120 206 80 202 60 L200 60 Z" fill="black" fill-opacity="0.1"/>
   </g>
 </svg>

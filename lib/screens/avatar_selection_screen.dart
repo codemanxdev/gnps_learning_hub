@@ -52,9 +52,11 @@ class _AvatarSelectionScreenState extends ConsumerState<AvatarSelectionScreen> {
             TextField(
               controller: _nameController,
               textCapitalization: TextCapitalization.words,
+              maxLength: 20,
               decoration: const InputDecoration(
                 hintText: 'Your name',
                 border: OutlineInputBorder(),
+                counterText: "",
               ),
               onChanged: (_) => setState(() {}),
             ),
