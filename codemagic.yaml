@@ -3,3 +3,11 @@ workflows:
     name: Codemagic Default Workflow
     max_build_duration: 120
     instance_type: mac_mini_m2
+    artifacts:
+      - build/**/outputs/**/*.apk
+      - build/**/outputs/**/*.aab
+      - build/**/outputs/**/mapping.txt
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+      - build/web.zip
+      - flutter_drive.log
