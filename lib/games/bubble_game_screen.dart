@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/game_config.dart';
+import '../config/ui_strings.dart';
 import '../providers/progress_providers.dart';
 import '../providers/audio_providers.dart';
 import '../widgets/common/task_speaker_button.dart';
@@ -369,7 +370,7 @@ class _BubbleGameScreenState extends ConsumerState<BubbleGameScreen>
                             vertical: 16,
                           ),
                         ),
-                        child: const Text('Back to Journey'),
+                        child: const Text(UIStrings.backToJourney),
                       ),
                     ],
                   ),

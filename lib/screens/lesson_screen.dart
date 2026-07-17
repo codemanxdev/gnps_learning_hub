@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../config/reward_config.dart';
+import '../config/ui_strings.dart';
 import '../models/journey.dart';
 import '../models/lesson.dart';
 import '../models/task.dart';
@@ -160,7 +161,7 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
               Navigator.of(context).pop(); // close dialog
               Navigator.of(context).pop(); // back to journey
             },
-            child: const Text('Back to Map'),
+            child: const Text(UIStrings.backToJourney),
           ),
           FilledButton(
             onPressed: () {
@@ -169,7 +170,7 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
                 () => _taskIndex++,
               ); // move to next task (start of next section)
             },
-            child: const Text('Continue'),
+            child: const Text(UIStrings.continueLabel),
           ),
         ],
       ),
@@ -189,7 +190,7 @@ class _LessonScreenState extends ConsumerState<LessonScreen> {
               Navigator.of(context).pop();
               Navigator.of(context).pop();
             },
-            child: const Text('Continue'),
+            child: const Text(UIStrings.continueLabel),
           ),
         ],
       ),
