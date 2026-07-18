@@ -14,6 +14,7 @@ GNPS Learning Hub is designed to make learning Punjabi engaging and fun for chil
 
 ## 🎮 Gamification & Engagement
 - **Gems & Rewards**: Earn gems for every lesson completed. The more you learn, the more you earn!
+- **Word Games**: Play word based puzzles and games.
 - **Daily Streaks**: Stay motivated with daily streaks. Build a habit by learning every day.
 - **Milestones**: Celebrate progress as you unlock new stages of your learning journey.
 
