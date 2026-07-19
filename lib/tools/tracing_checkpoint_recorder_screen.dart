@@ -24,7 +24,7 @@ class _CheckpointRecorderScreenState extends State<CheckpointRecorderScreen> {
   final TextEditingController _translitController = TextEditingController();
 
   String _letter = '';
-  final List<Offset> _tappedPoints = []; // raw canvas-local coordinates
+  final List<List<Offset>> _strokes = [[]]; // each sub-list is one pen stroke
 
   LetterInkMask? _mask;
   Size? _maskSize;
@@ -55,7 +55,8 @@ class _CheckpointRecorderScreenState extends State<CheckpointRecorderScreen> {
   void _onLetterChanged(String value) {
     setState(() {
       _letter = value;
-      _tappedPoints.clear();
+      _strokes.clear();
+      _strokes.add([]);
       _mask = null; // force rebuild on next layout pass
       _maskSize = null;
     });
@@ -64,43 +65,59 @@ class _CheckpointRecorderScreenState extends State<CheckpointRecorderScreen> {
   void _onCanvasTap(TapUpDetails details) {
     if (_mask == null) return; // wait for mask so taps map correctly
     setState(() {
-      _tappedPoints.add(details.localPosition);
+      _strokes.last.add(details.localPosition);
+    });
+  }
+
+  void _newStroke() {
+    if (_strokes.last.isEmpty) return;
+    setState(() {
+      _strokes.add([]);
     });
   }
 
   void _undoLast() {
-    if (_tappedPoints.isEmpty) return;
-    setState(() => _tappedPoints.removeLast());
+    setState(() {
+      if (_strokes.last.isNotEmpty) {
+        _strokes.last.removeLast();
+      } else if (_strokes.length > 1) {
+        _strokes.removeLast();
+      }
+    });
   }
 
   void _clearAll() {
-    setState(() => _tappedPoints.clear());
+    setState(() {
+      _strokes.clear();
+      _strokes.add([]);
+    });
   }
 
   String _buildExportSnippet() {
     final mask = _mask;
-    if (mask == null || _tappedPoints.isEmpty) return '';
+    final hasPoints = _strokes.any((s) => s.isNotEmpty);
+    if (mask == null || !hasPoints) return '';
 
     final bounds = mask.computeInkBounds();
     if (bounds == Rect.zero) return '// No ink detected for this letter.';
 
     final buffer = StringBuffer();
-    final translit = _translitController.text.trim();
-    buffer.writeln('{');
-    buffer.writeln("  'letter': '$_letter',");
-    if (translit.isNotEmpty) {
-      buffer.writeln("  'transliteration': '$translit',");
+    buffer.writeln("'checkpoints': [");
+
+    for (final stroke in _strokes) {
+      if (stroke.isEmpty) continue;
+      buffer.writeln('  [');
+      for (final point in stroke) {
+        final nx = ((point.dx - bounds.left) / bounds.width).clamp(0.0, 1.0);
+        final ny = ((point.dy - bounds.top) / bounds.height).clamp(0.0, 1.0);
+        buffer.writeln(
+          "    {'x': ${nx.toStringAsFixed(3)}, 'y': ${ny.toStringAsFixed(3)}},",
+        );
+      }
+      buffer.writeln('  ],');
     }
-    buffer.writeln("  'checkpoints': [");
-    for (final point in _tappedPoints) {
-      final nx = ((point.dx - bounds.left) / bounds.width).clamp(0.0, 1.0);
-      final ny = ((point.dy - bounds.top) / bounds.height).clamp(0.0, 1.0);
-      buffer.writeln(
-        "    {'x': ${nx.toStringAsFixed(3)}, 'y': ${ny.toStringAsFixed(3)}},",
-      );
-    }
-    buffer.writeln('  ],');
-    buffer.writeln('}');
+
+    buffer.writeln('],');
     return buffer.toString();
   }
 
@@ -150,19 +167,26 @@ class _CheckpointRecorderScreenState extends State<CheckpointRecorderScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final hasPoints = _strokes.any((s) => s.isNotEmpty);
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Checkpoint Recorder (Debug)'),
+        title: const Text('Tracing Checkpoint Recorder (Debug)'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.gesture),
+            tooltip: 'New Stroke',
+            onPressed: _strokes.last.isEmpty ? null : _newStroke,
+          ),
           IconButton(
             icon: const Icon(Icons.undo),
             tooltip: 'Undo last point',
-            onPressed: _tappedPoints.isEmpty ? null : _undoLast,
+            onPressed: !hasPoints && _strokes.length == 1 ? null : _undoLast,
           ),
           IconButton(
             icon: const Icon(Icons.delete_outline),
             tooltip: 'Clear all points',
-            onPressed: _tappedPoints.isEmpty ? null : _clearAll,
+            onPressed: !hasPoints ? null : _clearAll,
           ),
         ],
       ),
@@ -222,7 +246,7 @@ class _CheckpointRecorderScreenState extends State<CheckpointRecorderScreen> {
                             child: CustomPaint(
                               painter: _RecorderPainter(
                                 letter: _letter,
-                                points: _tappedPoints,
+                                strokes: _strokes,
                                 inkBounds: _mask?.computeInkBounds(),
                               ),
                               size: size,
@@ -250,12 +274,12 @@ class _CheckpointRecorderScreenState extends State<CheckpointRecorderScreen> {
 
 class _RecorderPainter extends CustomPainter {
   final String letter;
-  final List<Offset> points;
+  final List<List<Offset>> strokes;
   final Rect? inkBounds;
 
   _RecorderPainter({
     required this.letter,
-    required this.points,
+    required this.strokes,
     required this.inkBounds,
   });
 
@@ -281,8 +305,7 @@ class _RecorderPainter extends CustomPainter {
       ),
     );
 
-    // Debug: outline the detected tight ink bounds, so you can visually
-    // confirm the mask is picking up the glyph correctly before tapping.
+    // Debug: outline the detected tight ink bounds.
     if (inkBounds != null && inkBounds != Rect.zero) {
       final boundsPaint = Paint()
         ..color = Colors.blue.withValues(alpha: 0.4)
@@ -291,34 +314,40 @@ class _RecorderPainter extends CustomPainter {
       canvas.drawRect(inkBounds!, boundsPaint);
     }
 
-    // Connecting lines showing tap order.
     final linePaint = Paint()
       ..color = Colors.orange.withValues(alpha: 0.7)
       ..strokeWidth = 2;
-    for (int i = 0; i < points.length - 1; i++) {
-      canvas.drawLine(points[i], points[i + 1], linePaint);
-    }
 
-    // Numbered checkpoint dots.
-    for (int i = 0; i < points.length; i++) {
-      final dotPaint = Paint()..color = Colors.orange;
-      canvas.drawCircle(points[i], 14, dotPaint);
+    int pointCounter = 1;
+    for (int s = 0; s < strokes.length; s++) {
+      final points = strokes[s];
+      // Connecting lines showing tap order WITHIN this stroke.
+      for (int i = 0; i < points.length - 1; i++) {
+        canvas.drawLine(points[i], points[i + 1], linePaint);
+      }
 
-      final labelPainter = TextPainter(
-        text: TextSpan(
-          text: '${i + 1}',
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 14,
-            fontWeight: FontWeight.bold,
+      // Numbered checkpoint dots.
+      for (int i = 0; i < points.length; i++) {
+        final dotPaint = Paint()..color = Colors.orange;
+        canvas.drawCircle(points[i], 14, dotPaint);
+
+        final labelPainter = TextPainter(
+          text: TextSpan(
+            text: '$pointCounter',
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-        ),
-        textDirection: TextDirection.ltr,
-      )..layout();
-      labelPainter.paint(
-        canvas,
-        points[i] - Offset(labelPainter.width / 2, labelPainter.height / 2),
-      );
+          textDirection: TextDirection.ltr,
+        )..layout();
+        labelPainter.paint(
+          canvas,
+          points[i] - Offset(labelPainter.width / 2, labelPainter.height / 2),
+        );
+        pointCounter++;
+      }
     }
   }
 

@@ -6,7 +6,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 
 import '../providers/content_providers.dart';
 import '../providers/progress_providers.dart';
-import '../tools/checkpoint_recorder_screen.dart';
+import '../tools/tracing_checkpoint_recorder_screen.dart';
 import 'intro_screen.dart';
 
 const List<Color> _themeColorOptions = [
@@ -219,7 +219,7 @@ class SettingsScreen extends ConsumerWidget {
                   ),
                 ),
                 icon: Icons.edit_road,
-                label: 'Checkpoint Recorder',
+                label: 'Tracing Checkpoint Recorder',
               ),
             ],
           ],

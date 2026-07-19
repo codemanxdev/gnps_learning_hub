@@ -78,9 +78,16 @@ class TraceTaskWidget extends ConsumerStatefulWidget {
 class _Checkpoint {
   final Offset position; // resolved to widget-local pixel coords
   final double direction;
+  final int strokeIndex;
+  final bool isLastInStroke;
   bool reached = false;
 
-  _Checkpoint({required this.position, required this.direction});
+  _Checkpoint({
+    required this.position,
+    required this.direction,
+    required this.strokeIndex,
+    required this.isLastInStroke,
+  });
 }
 
 class _TraceTaskWidgetState extends ConsumerState<TraceTaskWidget>
@@ -215,34 +222,82 @@ class _TraceTaskWidgetState extends ConsumerState<TraceTaskWidget>
   List<_Checkpoint> _buildCheckpoints(Rect inkBounds) {
     final raw = widget.task.content['checkpoints'] as List<dynamic>?;
     if (raw == null || raw.isEmpty) return [];
-    if (inkBounds == Rect.zero) return []; // mask had no ink — bail safely
+    if (inkBounds == Rect.zero) return [];
 
-    final positions = raw.map((entry) {
-      final map = entry as Map<String, dynamic>;
-      final nx = (map['x'] as num).toDouble();
-      final ny = (map['y'] as num).toDouble();
-      return Offset(
-        inkBounds.left + nx * inkBounds.width,
-        inkBounds.top + ny * inkBounds.height,
-      );
-    }).toList();
+    final List<_Checkpoint> checkpoints = [];
 
-    return List.generate(positions.length, (i) {
-      Offset delta;
-      if (i < positions.length - 1) {
-        delta = positions[i + 1] - positions[i];
-      } else if (i > 0) {
-        // Last checkpoint: no "next" to point at, so keep the heading we
-        // arrived on rather than defaulting to a meaningless direction.
-        delta = positions[i] - positions[i - 1];
-      } else {
-        delta = Offset.zero; // a single, lone checkpoint
+    // Check if the data is in the new nested format: List<List<Map>>
+    final isNested = raw.first is List;
+
+    if (isNested) {
+      for (int s = 0; s < raw.length; s++) {
+        final strokePoints = raw[s] as List<dynamic>;
+        final List<Offset> positions = [];
+
+        for (final entry in strokePoints) {
+          final map = entry as Map<String, dynamic>;
+          final nx = (map['x'] as num).toDouble();
+          final ny = (map['y'] as num).toDouble();
+          positions.add(
+            Offset(
+              inkBounds.left + nx * inkBounds.width,
+              inkBounds.top + ny * inkBounds.height,
+            ),
+          );
+        }
+
+        for (int i = 0; i < positions.length; i++) {
+          Offset delta;
+          if (i < positions.length - 1) {
+            delta = positions[i + 1] - positions[i];
+          } else if (i > 0) {
+            delta = positions[i] - positions[i - 1];
+          } else {
+            delta = Offset.zero;
+          }
+          final direction = delta.distance > 0 ? math.atan2(delta.dy, delta.dx) : 0.0;
+          
+          checkpoints.add(_Checkpoint(
+            position: positions[i],
+            direction: direction,
+            strokeIndex: s,
+            isLastInStroke: i == positions.length - 1,
+          ));
+        }
       }
-      final direction = delta.distance > 0
-          ? math.atan2(delta.dy, delta.dx)
-          : 0.0;
-      return _Checkpoint(position: positions[i], direction: direction);
-    });
+    } else {
+      // Legacy flat list format: List<Map>
+      final List<Offset> positions = raw.map((entry) {
+        final map = entry as Map<String, dynamic>;
+        final nx = (map['x'] as num).toDouble();
+        final ny = (map['y'] as num).toDouble();
+        return Offset(
+          inkBounds.left + nx * inkBounds.width,
+          inkBounds.top + ny * inkBounds.height,
+        );
+      }).toList();
+
+      for (int i = 0; i < positions.length; i++) {
+        Offset delta;
+        if (i < positions.length - 1) {
+          delta = positions[i + 1] - positions[i];
+        } else if (i > 0) {
+          delta = positions[i] - positions[i - 1];
+        } else {
+          delta = Offset.zero;
+        }
+        final direction = delta.distance > 0 ? math.atan2(delta.dy, delta.dx) : 0.0;
+
+        checkpoints.add(_Checkpoint(
+          position: positions[i],
+          direction: direction,
+          strokeIndex: 0,
+          isLastInStroke: i == positions.length - 1,
+        ));
+      }
+    }
+
+    return checkpoints;
   }
 
   Future<void> _ensureMask(Size size, String letter) async {
@@ -403,18 +458,25 @@ class _TraceTaskWidgetState extends ConsumerState<TraceTaskWidget>
 
   /// Replaces the drawn stroke since the previous checkpoint with a
   /// straight line from that checkpoint's position to [reachedIndex]'s
-  /// position — i.e. auto-corrects the visual trace onto the ideal path the
-  /// moment a checkpoint is reached, rather than leaving the child's raw,
-  /// wobbly points on screen. If [reachedIndex] is the very first
-  /// checkpoint, there's no previous checkpoint to draw a line from, so the
-  /// child's freehand approach to it is left untouched.
+  /// position. If [reachedIndex] is the start of a NEW stroke, we do NOT
+  /// bridge the gap to the previous stroke's end.
   void _straightenSinceCheckpoint(int reachedIndex) {
     if (reachedIndex <= 0) {
       _correctionStartIndex = _points.length;
       return;
     }
-    final anchor = _checkpoints[reachedIndex - 1].position;
-    final target = _checkpoints[reachedIndex].position;
+
+    final current = _checkpoints[reachedIndex];
+    final prev = _checkpoints[reachedIndex - 1];
+
+    // If we just jumped across a pen-lift boundary, don't bridge them.
+    if (current.strokeIndex != prev.strokeIndex) {
+      _correctionStartIndex = _points.length;
+      return;
+    }
+
+    final anchor = prev.position;
+    final target = current.position;
     final start = _correctionStartIndex.clamp(0, _points.length);
     _points
       ..removeRange(start, _points.length)
@@ -632,7 +694,7 @@ class _TracePainter extends CustomPainter {
     for (int i = 0; i < checkpoints.length; i++) {
       final checkpoint = checkpoints[i];
       final isNext = i == nextCheckpointIndex;
-      final isStart = i == 0;
+      final isFirstInStroke = i == 0 || checkpoints[i - 1].isLastInStroke;
 
       Color color;
       double scale;
@@ -640,7 +702,7 @@ class _TracePainter extends CustomPainter {
       if (checkpoint.reached) {
         color = Colors.green;
         scale = 1.0;
-      } else if (isStart && isNext) {
+      } else if (isFirstInStroke && isNext) {
         color = Colors.green;
         scale = 1.0 + hintPulse * 0.5; // bigger pulse than a regular "next"
         _drawStartHalo(canvas, checkpoint.position, hintPulse);
@@ -656,16 +718,14 @@ class _TracePainter extends CustomPainter {
     }
 
     // Direction hint: a pulsing line from the last-reached checkpoint to
-    // the next required one, so the child sees which way to trace next.
-    // No arrowhead here — the checkpoint arrows themselves already show
-    // direction, so a second arrowhead at the same spot would be redundant.
-    // Before anything is reached, the first checkpoint just pulses green
-    // alone (handled above) as a "start here" cue — no line needed since
-    // there's no "from" point yet.
+    // the next required one, but ONLY if they belong to the same stroke.
     if (nextCheckpointIndex > 0 && nextCheckpointIndex < checkpoints.length) {
-      final from = checkpoints[nextCheckpointIndex - 1].position;
-      final to = checkpoints[nextCheckpointIndex].position;
-      _drawDirectionHintLine(canvas, from, to, hintPulse);
+      final prev = checkpoints[nextCheckpointIndex - 1];
+      final current = checkpoints[nextCheckpointIndex];
+
+      if (prev.strokeIndex == current.strokeIndex) {
+        _drawDirectionHintLine(canvas, prev.position, current.position, hintPulse);
+      }
     }
 
     // User's traced strokes — red once the attempt has failed, thin while
