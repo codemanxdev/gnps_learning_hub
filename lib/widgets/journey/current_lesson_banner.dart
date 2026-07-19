@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../config/reward_config.dart';
+import '../../config/ui_strings.dart';
 
 class CurrentLessonBanner extends StatelessWidget {
   final String lessonTitle;
@@ -100,10 +101,11 @@ class CurrentLessonBanner extends StatelessWidget {
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  'Task ${taskIndex + 1} of $totalTasks',
+                  '${UIStrings.taskLabel} ${taskIndex + 1} ${UIStrings.ofLabel} $totalTasks',
                   style: TextStyle(
                     color: scheme.onPrimary.withValues(alpha: 0.8),
                     fontSize: 12,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ],

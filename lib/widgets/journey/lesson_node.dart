@@ -1,6 +1,8 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
+import '../../config/ui_strings.dart';
+
 enum LessonNodeState { locked, unlocked, current, completed }
 
 /// Wraps the node with a bright circular progress ring showing how much
@@ -160,9 +162,8 @@ class LessonNode extends StatelessWidget {
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: Theme.of(context).textTheme.labelMedium?.copyWith(
-              fontWeight: state == LessonNodeState.current
-                  ? FontWeight.bold
-                  : FontWeight.normal,
+              fontWeight: FontWeight.bold,
+              fontSize: state == LessonNodeState.current ? 14 : 12,
               color: state == LessonNodeState.locked ? Colors.grey : null,
             ),
           ),
@@ -296,7 +297,7 @@ class _StartBubbleState extends State<_StartBubble>
           border: Border.all(color: Colors.white, width: 3),
         ),
         child: Text(
-          widget.isStarted ? 'CONTINUE' : 'START',
+          widget.isStarted ? UIStrings.continueCapsLabel : UIStrings.startLabel,
           softWrap: false,
           overflow: TextOverflow.visible,
           style: const TextStyle(
