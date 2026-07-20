@@ -189,14 +189,31 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 final appVersion = snapshot.hasData
                     ? '${snapshot.data!.version} (${snapshot.data!.buildNumber})'
                     : '—';
-                final journeyVersion = ref
-                    .watch(journeyProvider)
-                    .maybeWhen(data: (j) => '${j.version}', orElse: () => '—');
+
+                final journeyAsync = ref.watch(journeyProvider);
+                final journeyVersion = journeyAsync.maybeWhen(
+                  data: (j) => '${j.version}',
+                  orElse: () => '—',
+                );
+                final totalLessons = journeyAsync.maybeWhen(
+                  data: (j) => '${j.activeLessons.length}',
+                  orElse: () => '—',
+                );
+                final totalTasks = journeyAsync.maybeWhen(
+                  data: (j) =>
+                      '${j.activeLessons.fold<int>(0, (sum, lesson) => sum + lesson.allTasks.length)}',
+                  orElse: () => '—',
+                );
+                final totalGames = journeyAsync.maybeWhen(
+                  data: (j) => '${j.games.length}',
+                  orElse: () => '—',
+                );
 
                 return Column(
                   children: [
                     GestureDetector(
-                      onTap: () => _handleVersionTap(progress.isDeveloperModeEnabled),
+                      onTap: () =>
+                          _handleVersionTap(progress.isDeveloperModeEnabled),
                       behavior: HitTestBehavior.opaque,
                       child: ListTile(
                         contentPadding: const EdgeInsets.symmetric(
@@ -214,6 +231,30 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       leading: const Icon(Icons.menu_book_outlined),
                       title: const Text('Lesson content version'),
                       trailing: Text(journeyVersion),
+                    ),
+                    ListTile(
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                      ),
+                      leading: const Icon(Icons.school_outlined),
+                      title: const Text('Total lessons'),
+                      trailing: Text(totalLessons),
+                    ),
+                    ListTile(
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                      ),
+                      leading: const Icon(Icons.checklist_outlined),
+                      title: const Text('Total interactive tasks'),
+                      trailing: Text(totalTasks),
+                    ),
+                    ListTile(
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                      ),
+                      leading: const Icon(Icons.videogame_asset_outlined),
+                      title: const Text('Total games'),
+                      trailing: Text(totalGames),
                     ),
                   ],
                 );
@@ -247,9 +288,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               const SizedBox(height: 12),
               _SettingsActionButton(
                 onPressed: () => Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => const ContentDebugScreen(),
-                  ),
+                  MaterialPageRoute(builder: (_) => const ContentDebugScreen()),
                 ),
                 icon: Icons.bug_report_outlined,
                 label: 'Content Progress Debug',
@@ -267,7 +306,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               if (progress.isDeveloperModeEnabled) ...[
                 const SizedBox(height: 12),
                 _SettingsActionButton(
-                  onPressed: () => ref.read(progressProvider.notifier).updateDeveloperMode(false),
+                  onPressed: () => ref
+                      .read(progressProvider.notifier)
+                      .updateDeveloperMode(false),
                   icon: Icons.no_accounts,
                   label: 'Disable Developer Mode',
                   isDestructive: true,
@@ -292,7 +333,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       final messenger = ScaffoldMessenger.of(context);
       messenger.clearSnackBars();
       messenger.showSnackBar(
-        SnackBar(content: Text('You are $remaining steps away from developer mode.')),
+        SnackBar(
+          content: Text('You are $remaining steps away from developer mode.'),
+        ),
       );
     } else if (remaining <= 0) {
       _tapCount = 0;
@@ -360,9 +403,9 @@ class _SectionHeader extends StatelessWidget {
       child: Text(
         title,
         style: Theme.of(context).textTheme.titleSmall?.copyWith(
-              color: Theme.of(context).colorScheme.primary,
-              fontWeight: FontWeight.bold,
-            ),
+          color: Theme.of(context).colorScheme.primary,
+          fontWeight: FontWeight.bold,
+        ),
       ),
     );
   }
