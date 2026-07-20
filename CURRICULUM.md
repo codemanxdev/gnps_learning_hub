@@ -2,6 +2,15 @@
 
 This document is automatically generated from the app's lesson data.
 
+### 📊 App Statistics
+- **Total Lessons**: 7
+- **Total Interactive Tasks**: 557
+- **Total Games**: 2
+
+---
+
+## 📚 Lessons
+
 ### 1. Alphabet Tracing (35 tasks)
 *Master the strokes of the Gurmukhi script.*
 - **Foundation Sounds** (5 tasks)
@@ -103,22 +112,19 @@ This document is automatically generated from the app's lesson data.
 - **Shopping** (5 tasks)
 - **Eating** (5 tasks)
 
-### 📊 App Statistics
-- **Total Lessons**: 7
-- **Total Interactive Tasks**: 557
-
 ---
 
 ## 🕹️ Arcade Games
 
 - **Letter Bubbles**: bubble pop game unlocked after `lesson_tracing`.
 - **Word Bubbles**: bubble pop game unlocked after `lesson_matching_words`.
+
 ---
 
 ### 🛠️ Maintenance
 To refresh this document after modifying lesson data, run:
 ```bash
-flutter test test/tools/generate_curriculum_test.dart
+dart run tool/generate_curriculum.dart
 ```
 
 ---
