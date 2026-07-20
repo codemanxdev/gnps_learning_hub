@@ -221,12 +221,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ),
             const Divider(height: 32),
             const _SectionHeader('Support'),
-            _SettingsActionButton(
-              onPressed: _contactSupport,
-              icon: Icons.email_outlined,
-              label: 'Contact Support',
+            ListTile(
+              onTap: _contactSupport,
+              leading: const Icon(Icons.email_outlined),
+              title: const Text('Contact Support'),
+              subtitle: const Text(UIStrings.supportEmail),
+              trailing: const Icon(Icons.open_in_new, size: 16),
             ),
             const Divider(height: 32),
+            const _SectionHeader('Account management'),
             _SettingsActionButton(
               onPressed: () => _confirmAndReset(context),
               icon: Icons.restart_alt,
