@@ -1,3 +1,5 @@
+import '../../config/content_ids.dart';
+
 /// Lesson data for "Match the Word".
 /// Part of the app's bundled content store (see `lib/data/journey_data.dart`).
 ///
@@ -7,7 +9,7 @@
 /// days of the week have no visually distinct emoji, so word-to-emoji
 /// matching doesn't work for them (see chat note).
 final Map<String, dynamic> lessonMatchingImages = {
-  'id': 'lesson_matching_images',
+  'id': ContentIds.matchingPictures,
   'title': 'Match the Picture',
   'order': 4,
   'visible': true,

@@ -33,7 +33,7 @@ import 'games/word_bubble_game_data.dart';
 /// NOTE: Gurmukhi spellings/grammar should be reviewed by a native speaker
 /// before wider release.
 final Journey journeyData = Journey.fromJson({
-  'version': 18,
+  'version': 19,
   'lessons': [
     lessonTracing,
     lessonLetterSelection,

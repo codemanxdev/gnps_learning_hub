@@ -84,7 +84,7 @@ This document is automatically generated from the app's lesson data.
 ## 🕹️ Arcade Games
 
 - **Letter Bubbles**: bubble pop game unlocked after `lesson_tracing`.
-- **Word Bubbles**: bubble pop game unlocked after `lesson_arrange_sentence`.
+- **Word Bubbles**: bubble pop game unlocked after `lesson_matching_words`.
 ---
 
 ### 🛠️ Maintenance

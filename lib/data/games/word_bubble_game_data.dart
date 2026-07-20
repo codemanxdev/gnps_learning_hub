@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import '../../config/content_ids.dart';
 
 /// Configuration for the "Word Bubbles" game.
 final Map<String, dynamic> wordBubbleGameConfig = {
-  'id': 'bubble_pop_words',
+  'id': ContentIds.bubblePopWords,
   'title': 'Word Bubbles',
-  'unlockAfterLessonId': 'matchingWords',
+  'unlockAfterLessonId': ContentIds.matchingWords,
   'type': 'bubble_pop',
   'mapXOffset': -110.0, // Tucked into the left tree line
   'mapYOffset': -20.0, // Slightly above the lesson node to avoid bottom edge

@@ -1,6 +1,8 @@
+import '../../config/content_ids.dart';
+
 /// Lesson data for "Match the Words (Translation)".
 final Map<String, dynamic> lessonMatchingWords = {
-  'id': 'lesson_matching_words',
+  'id': ContentIds.matchingWords,
   'title': 'Match the Words',
   'order': 5,
   'visible': true,

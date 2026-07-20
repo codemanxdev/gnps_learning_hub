@@ -1,7 +1,9 @@
+import '../../config/content_ids.dart';
+
 /// Lesson data for "Sentence Arrangement".
 /// Part of the app's bundled content store (see `lib/data/journey_data.dart`).
 final Map<String, dynamic> lessonArrangeSentence = {
-  'id': 'lesson_arrange_sentence',
+  'id': ContentIds.arrangeSentence,
   'title': 'Sentence Arrangement',
   'order': 7,
   'visible': true,

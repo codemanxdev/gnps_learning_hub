@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import '../../config/content_ids.dart';
 
 /// Configuration for the "Letter Bubbles" game.
 final Map<String, dynamic> bubbleGameConfig = {
-  'id': 'bubble_pop_letters',
+  'id': ContentIds.bubblePopLetters,
   'title': 'Letter Bubbles',
-  'unlockAfterLessonId': 'lesson_tracing',
+  'unlockAfterLessonId': ContentIds.tracing,
   'type': 'bubble_pop',
   'mapXOffset': 150.0,
   'mapYOffset': 80.0,

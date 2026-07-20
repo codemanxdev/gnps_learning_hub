@@ -1,6 +1,8 @@
+import '../../config/content_ids.dart';
+
 /// Lesson data for "Letter Identification".
 final Map<String, dynamic> lessonLetterSelection = {
-  'id': 'lesson_letter_selection',
+  'id': ContentIds.letterSelection,
   'title': 'Letter Identification',
   'order': 2,
   'visible': true,

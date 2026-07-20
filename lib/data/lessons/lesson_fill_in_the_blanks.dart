@@ -1,7 +1,9 @@
+import '../../config/content_ids.dart';
+
 /// Lesson data for "Fill in the Blanks".
 /// Part of the app's bundled content store (see `lib/data/journey_data.dart`).
 final Map<String, dynamic> lessonFillInBlank = {
-  'id': 'lesson_fill_in_blank',
+  'id': ContentIds.fillInBlank,
   'title': 'Fill in the Blanks',
   'order': 6,
   'visible': true,

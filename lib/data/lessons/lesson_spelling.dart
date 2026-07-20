@@ -1,3 +1,5 @@
+import '../../config/content_ids.dart';
+
 /// Lesson data for "Spelling".
 /// Part of the app's bundled content store (see `lib/data/journey_data.dart`).
 ///
@@ -7,7 +9,7 @@
 /// Items" merged into one section. New sections added: Clothes, Kitchen,
 /// Nature, Birds, Days, Directions, Office, Shopping, Eating.
 final Map<String, dynamic> lessonSpelling = {
-  'id': 'lesson_spelling',
+  'id': ContentIds.spelling,
   'title': 'Spelling',
   'order': 3,
   'visible': true,

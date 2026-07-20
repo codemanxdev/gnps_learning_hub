@@ -1,3 +1,5 @@
+import '../../config/content_ids.dart';
+
 /// Lesson data for "Alphabet Tracing".
 /// Part of the app's bundled content store (see `lib/data/journey_data.dart`).
 ///
@@ -7,7 +9,7 @@
 /// `_checkpointRadius = 20` and the unreached-dot color to `Colors.orange`
 /// in TraceTaskWidget, then nudge x/y until dots align with the ink.
 final Map<String, dynamic> lessonTracing = {
-  'id': 'lesson_tracing',
+  'id': ContentIds.tracing,
   'title': 'Alphabet Tracing',
   'order': 1,
   'visible': true,
