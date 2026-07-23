@@ -2,452 +2,383 @@
 import 'dart:io';
 import 'package:gnps_learning_hub/data/journey_data.dart';
 
-/// Generates a modern 1-page marketing PDF of the curriculum.
+/// Generates a premium, modern 1-page marketing PDF of the curriculum.
 ///
 /// To run this tool, use:
 /// ```bash
 /// flutter test tool/marketing_generator.dart
 /// ```
-///
-/// KEY FIX vs the original: LibreOffice's HTML→PDF converter has very
-/// weak support for Flexbox, CSS Grid, and gradients — that's why the
-/// layout was breaking. This version prints the PDF with headless
-/// Chromium instead, which renders modern CSS the same way a browser
-/// would.
-///
-/// Requires Chromium or Google Chrome installed on the machine that
-/// runs this script. Set CHROMIUM_PATH below if it's not on your PATH.
 void main() async {
-  print('🚀 Starting Modern Curriculum Generator...');
+  print('🚀 Starting Premium Curriculum Brochure Generator...');
   await generateMarketingPdf();
 }
 
-const String chromiumPath = String.fromEnvironment(
-  'CHROMIUM_PATH',
-  defaultValue:
-      'chromium', // try 'google-chrome', 'chromium-browser', or a full path if this fails
-);
-
 Future<void> generateMarketingPdf() async {
   final buffer = StringBuffer();
-
+  
   int appTotalTasks = 0;
   for (final lesson in journeyData.lessons) {
     appTotalTasks += lesson.allTasks.length;
   }
 
+  // Icons for lesson titles
+  final lessonIcons = [
+    '✍️', // Tracing
+    '👂', // Letter Selection
+    '🔡', // Spelling
+    '🖼️', // Match Picture
+    '📖', // Match Words
+    '✏️', // Fill in Blanks
+    '🧩', // Sentence Arrangement
+  ];
+
+  // Modern CSS for a high-end 1-page brochure
   const style = '''
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Manrope:wght@400;600;700;800&display=swap');
-
-  @page { size: A4; margin: 0; }
-
-  :root{
-    --ink:#0E2438;
-    --indigo:#0B3D66;
-    --indigo-deep:#062339;
-    --amber:#FFB020;
-    --amber-deep:#E8930A;
-    --teal:#2A9D8F;
-    --cream:#FFF9EF;
-    --paper:#FFFFFF;
-    --line:#E4DCC9;
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+  
+  @page {
+    size: A4;
+    margin: 0;
   }
 
-  *{ box-sizing:border-box; }
-
-  body{
-    font-family:'Manrope', sans-serif;
-    color:var(--ink);
-    margin:0;
-    background:var(--cream);
-    -webkit-font-smoothing:antialiased;
+  body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    color: #0f172a;
+    margin: 0;
+    padding: 0;
+    background: #fdfdfd;
+    -webkit-print-color-adjust: exact;
+  }
+  
+  .hero {
+    background: linear-gradient(135deg, #02569B 0%, #0369a1 100%);
+    color: white;
+    padding: 50px 60px 80px 60px;
+    text-align: left;
+    position: relative;
+    overflow: hidden;
   }
 
-  .page{
-    width:210mm;
-    height:297mm;
-    position:relative;
-    overflow:hidden;
-    display:flex;
-    flex-direction:column;
+  .hero::after {
+    content: '';
+    position: absolute;
+    top: -50px;
+    right: -50px;
+    width: 200px;
+    height: 200px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 50%;
+  }
+  
+  .hero h1 {
+    font-size: 42px;
+    font-weight: 800;
+    margin: 0;
+    letter-spacing: -1.5px;
+    line-height: 1;
+  }
+  
+  .hero p {
+    font-size: 20px;
+    font-weight: 500;
+    opacity: 0.9;
+    margin: 12px 0 0 0;
+  }
+  
+  .stats-container {
+    display: flex;
+    justify-content: flex-start;
+    gap: 24px;
+    margin-top: -50px;
+    padding: 0 60px;
+    position: relative;
+    z-index: 10;
+  }
+  
+  .stat-card {
+    background: #ffffff;
+    padding: 24px 32px;
+    border-radius: 24px;
+    text-align: center;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+    border: 1px solid rgba(2, 86, 155, 0.05);
+    flex: 1;
+    max-width: 180px;
+  }
+  
+  .stat-card.featured {
+    background: #FFCA28;
+    border: none;
+  }
+  
+  .stat-value {
+    display: block;
+    font-size: 34px;
+    font-weight: 800;
+    color: #02569B;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  
+  .stat-label {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: #64748b;
   }
 
-  .hero{
-    background:
-      radial-gradient(circle at 88% -10%, rgba(255,176,32,0.35), transparent 45%),
-      linear-gradient(135deg, var(--indigo) 0%, var(--indigo-deep) 100%);
-    color:#fff;
-    padding:12mm 16mm 11mm 16mm;
-    position:relative;
+  .stat-card.featured .stat-label {
+    color: #02569B;
+    opacity: 0.8;
+  }
+  
+  .content {
+    padding: 60px 60px 40px 60px;
+  }
+  
+  .section-heading {
+    font-size: 24px;
+    font-weight: 800;
+    color: #02569B;
+    margin-bottom: 30px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
   }
 
-  .path-track{
-    position:absolute;
-    top:0; right:0; bottom:0; left:0;
-    opacity:0.14;
-    background-image: radial-gradient(circle, #fff 2.2px, transparent 2.2px);
-    background-size:16px 16px;
-    background-position: -4px -4px;
-    mask-image: linear-gradient(to bottom, black, transparent 85%);
+  .section-heading::after {
+    content: '';
+    flex: 1;
+    height: 2px;
+    background: #f1f5f9;
+  }
+  
+  .curriculum-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 40px;
+    row-gap: 24px;
+  }
+  
+  .lesson-card {
+    background: white;
+    border: 1px solid #f1f5f9;
+    border-radius: 20px;
+    padding: 20px;
+    transition: transform 0.2s;
+    position: relative;
+    page-break-inside: avoid;
   }
 
-  .eyebrow{
-    display:inline-flex;
-    align-items:center;
-    gap:7px;
-    background:rgba(255,255,255,0.12);
-    border:1px solid rgba(255,255,255,0.28);
-    padding:5px 13px;
-    border-radius:999px;
-    font-size:10.5px;
-    font-weight:700;
-    letter-spacing:0.14em;
-    text-transform:uppercase;
-    position:relative;
-    z-index:1;
+  .lesson-number {
+    position: absolute;
+    top: -12px;
+    left: 20px;
+    background: #02569B;
+    color: white;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 800;
+    box-shadow: 0 4px 10px rgba(2, 86, 155, 0.2);
   }
-  .eyebrow .dot{ width:6px; height:6px; border-radius:50%; background:var(--amber); }
-
-  .hero-top{
-    display:flex;
-    align-items:flex-end;
-    justify-content:space-between;
-    gap:14mm;
-    margin-top:10px;
-    position:relative;
-    z-index:1;
+  
+  .lesson-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    padding-top: 5px;
   }
-
-  .hero h1{
-    font-family:'Baloo 2', sans-serif;
-    font-weight:800;
-    font-size:34px;
-    line-height:1.06;
-    margin:0;
-    letter-spacing:-0.5px;
-    flex:0 0 auto;
-    max-width:95mm;
+  
+  .lesson-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
-  .hero h1 span{ color:var(--amber); }
-
-  .hero p.sub{
-    font-size:12.5px;
-    color:rgba(255,255,255,0.82);
-    margin:0 0 3px 0;
-    line-height:1.6;
-    font-weight:500;
-    flex:1 1 auto;
-    max-width:86mm;
-    text-align:left;
-    border-left:2px solid rgba(255,176,32,0.5);
-    padding-left:10px;
+  
+  .micro-badge {
+    font-size: 10px;
+    background: #f1f5f9;
+    color: #64748b;
+    padding: 4px 10px;
+    border-radius: 99px;
+    font-weight: 700;
+    text-transform: uppercase;
   }
-
-  .stat-row{
-    display:flex;
-    gap:10mm;
-    margin-top:9mm;
-    position:relative;
-    z-index:1;
+  
+  .section-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 13px;
+    color: #475569;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
   }
-  .stat{
-    flex:1;
-    display:flex;
-    align-items:baseline;
-    gap:9px;
-    border-left:2px solid rgba(255,176,32,0.55);
-    padding-left:10px;
+  
+  .section-chip {
+    background: #f8fafc;
+    border: 1px solid #f1f5f9;
+    padding: 4px 10px;
+    border-radius: 8px;
+    white-space: nowrap;
   }
-  .stat b{
-    font-family:'Baloo 2', sans-serif;
-    font-size:30px;
-    font-weight:800;
-    color:var(--amber);
-    line-height:1;
+  
+  .fun-zone {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    margin-top: 50px;
+    padding: 30px 40px;
+    border-radius: 24px;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    page-break-inside: avoid;
   }
-  .stat span{
-    font-size:10.5px;
-    font-weight:700;
-    text-transform:uppercase;
-    letter-spacing:0.08em;
-    color:rgba(255,255,255,0.72);
+  
+  .fun-zone-text h3 {
+    font-size: 22px;
+    font-weight: 800;
+    margin: 0 0 5px 0;
+    color: #FFCA28;
   }
-
-  .body-wrap{
-    flex:1;
-    padding:11mm 16mm 8mm 16mm;
-    display:flex;
-    flex-direction:column;
+  
+  .fun-zone-text p {
+    font-size: 14px;
+    opacity: 0.8;
+    margin: 0;
   }
-
-  .section-label{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    margin:0 0 7mm 0;
+  
+  .game-container {
+    display: flex;
+    gap: 12px;
   }
-  .section-label .rule{ flex:1; height:1px; background:var(--line); }
-  .section-label h2{
-    font-family:'Baloo 2', sans-serif;
-    font-size:15px;
-    font-weight:700;
-    color:var(--indigo);
-    text-transform:uppercase;
-    letter-spacing:0.08em;
-    margin:0;
-    white-space:nowrap;
-  }
-
-  .journey{
-    position:relative;
-    display:grid;
-    grid-template-columns:repeat(2, 1fr);
-    gap:6mm 9mm;
+  
+  .game-pill {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 8px 16px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
 
-  .stop{
-    background:var(--paper);
-    border:1px solid var(--line);
-    border-radius:12px;
-    padding:9px 11px 10px 11px;
-    position:relative;
-    box-shadow:0 3px 0 rgba(11,61,102,0.05);
+  .game-pill span {
+    color: #FFCA28;
   }
 
-  .stop .num{
-    position:absolute;
-    top:-9px;
-    left:11px;
-    background:var(--teal);
-    color:#fff;
-    font-size:10px;
-    font-weight:800;
-    width:19px;
-    height:19px;
-    border-radius:50%;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    box-shadow:0 2px 4px rgba(0,0,0,0.18);
+  .footer-meta {
+    margin-top: 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 20px;
+    border-top: 1px solid #f1f5f9;
+    color: #94a3b8;
+    font-size: 11px;
+    font-weight: 600;
   }
-
-  .stop h3{
-    font-family:'Baloo 2', sans-serif;
-    font-size:12.5px;
-    font-weight:700;
-    color:var(--indigo);
-    margin:5px 0 5px 0;
-    line-height:1.2;
-  }
-
-  .stop .count{
-    font-size:9.5px;
-    font-weight:700;
-    color:var(--amber-deep);
-    background:#FFF3DC;
-    border-radius:6px;
-    padding:1.5px 6px;
-    display:inline-block;
-    margin-bottom:5px;
-  }
-
-  .stop .pills{
-    display:flex;
-    flex-wrap:wrap;
-    gap:4px;
-  }
-  .stop .pill{
-    display:inline-flex;
-    align-items:baseline;
-    gap:4px;
-    background:#F0F6F5;
-    border:1px solid #DCEBE8;
-    border-radius:999px;
-    padding:2.5px 8px;
-    font-size:8.5px;
-    font-weight:600;
-    color:#33505E;
-    line-height:1.3;
-  }
-  .stop .pill b{
-    font-size:8.5px;
-    font-weight:800;
-    color:var(--teal);
-  }
-
-  .arcade{
-    margin-top:8mm;
-    background:linear-gradient(120deg, #0B3D66, #123F63 60%, #0B3D66);
-    border-radius:14px;
-    padding:9mm 11mm;
-    color:#fff;
-    display:flex;
-    align-items:center;
-    gap:9mm;
-  }
-  .arcade .icon{
-    width:46px; height:46px;
-    border-radius:12px;
-    background:var(--amber);
-    display:flex; align-items:center; justify-content:center;
-    font-size:22px;
-    flex:none;
-  }
-  .arcade .text{ flex:none; width:44mm; }
-  .arcade .text h3{
-    font-family:'Baloo 2', sans-serif;
-    font-size:14px;
-    margin:0 0 3px 0;
-  }
-  .arcade .text p{
-    font-size:9.5px;
-    margin:0;
-    color:rgba(255,255,255,0.72);
-    line-height:1.4;
-  }
-  .tags{
-    display:flex;
-    flex-wrap:wrap;
-    gap:6px;
-    flex:1;
-  }
-  .tag{
-    background:rgba(255,255,255,0.1);
-    border:1px solid rgba(255,255,255,0.24);
-    padding:4px 10px;
-    border-radius:999px;
-    font-size:9.5px;
-    font-weight:600;
-  }
-
-  .footer{
-    margin-top:auto;
-    padding-top:6mm;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    font-size:8.5px;
-    color:#9BA9B6;
-    border-top:1px solid var(--line);
-  }
-  .footer .brand{ font-weight:700; color:var(--indigo); }
 </style>
 ''';
 
-  buffer.writeln(
-    '<!DOCTYPE html><html><head><meta charset="UTF-8">$style</head><body>',
-  );
-  buffer.writeln('<div class="page">');
+  buffer.writeln('<!DOCTYPE html><html><head><meta charset="UTF-8">$style</head><body>');
 
-  // Hero
+  // Hero Section
   buffer.writeln('<div class="hero">');
-  buffer.writeln('  <div class="path-track"></div>');
-  buffer.writeln(
-    '  <span class="eyebrow"><span class="dot"></span>GNPS Learning Hub</span>',
-  );
-  buffer.writeln('  <div class="hero-top">');
-  buffer.writeln(
-    '    <h1>Punjabi, learned<br>the <span>joyful</span> way</h1>',
-  );
-  buffer.writeln(
-    '    <p class="sub">A complete guided curriculum that takes young learners from first letters to fluent little readers — one playful lesson at a time.</p>',
-  );
-  buffer.writeln('  </div>');
-  buffer.writeln('  <div class="stat-row">');
-  buffer.writeln(
-    '    <div class="stat"><b>${journeyData.lessons.length}</b><span>Lessons</span></div>',
-  );
-  buffer.writeln(
-    '    <div class="stat"><b>$appTotalTasks</b><span>Activities</span></div>',
-  );
-  buffer.writeln(
-    '    <div class="stat"><b>${journeyData.games.length}</b><span>Arcade Games</span></div>',
-  );
-  buffer.writeln('  </div>');
+  buffer.writeln('  <h1>GNPS Learning Hub</h1>');
+  buffer.writeln('  <p>The Premium Punjabi Learning Adventure for Kids</p>');
   buffer.writeln('</div>');
 
-  buffer.writeln('<div class="body-wrap">');
-  buffer.writeln(
-    '  <div class="section-label"><h2>The Learning Journey</h2><div class="rule"></div></div>',
-  );
-  buffer.writeln('  <div class="journey">');
+  // Stats Row
+  buffer.writeln('<div class="stats-container">');
+  buffer.writeln('  <div class="stat-card"><span class="stat-value">${journeyData.lessons.length}</span><span class="stat-label">Levels</span></div>');
+  buffer.writeln('  <div class="stat-card featured"><span class="stat-value">$appTotalTasks</span><span class="stat-label">Interactive Tasks</span></div>');
+  buffer.writeln('  <div class="stat-card"><span class="stat-value">${journeyData.games.length}</span><span class="stat-label">Arcade Games</span></div>');
+  buffer.writeln('</div>');
+
+  buffer.writeln('<div class="content">');
+  
+  buffer.writeln('<div class="section-heading">Curriculum Roadmap</div>');
+  buffer.writeln('<div class="curriculum-grid">');
 
   for (var i = 0; i < journeyData.lessons.length; i++) {
     final lesson = journeyData.lessons[i];
-    buffer.writeln('    <div class="stop">');
-    buffer.writeln('      <span class="num">${i + 1}</span>');
-    buffer.writeln('      <h3>${lesson.title}</h3>');
-    buffer.writeln(
-      '      <span class="count">${lesson.allTasks.length} activities</span>',
-    );
-    buffer.writeln('      <div class="pills">');
+    final icon = i < lessonIcons.length ? lessonIcons[i] : '📚';
+    
+    buffer.writeln('    <div class="lesson-card">');
+    buffer.writeln('      <div class="lesson-number">${i + 1}</div>');
+    buffer.writeln('      <div class="lesson-header">');
+    buffer.writeln('        <h3 class="lesson-title">$icon ${lesson.title}</h3>');
+    buffer.writeln('        <span class="micro-badge">${lesson.allTasks.length} tasks</span>');
+    buffer.writeln('      </div>');
+    buffer.writeln('      <div class="section-list">');
     for (final section in lesson.sections) {
-      // NOTE: assumes `section.tasks` exists (mirrors lesson.allTasks).
-      // If your Section model names this differently, swap it in below.
-      buffer.writeln(
-        '        <span class="pill">${section.title} <b>${section.tasks.length}</b></span>',
-      );
+      buffer.writeln('        <div class="section-chip">${section.title}</div>');
     }
     buffer.writeln('      </div>');
     buffer.writeln('    </div>');
   }
 
-  buffer.writeln('  </div>'); // end journey grid
+  buffer.writeln('  </div>'); // End grid
 
-  // Arcade
-  buffer.writeln('  <div class="arcade">');
-  buffer.writeln('    <div class="icon">🕹️</div>');
-  buffer.writeln(
-    '    <div class="text"><h3>Learning Arcade</h3><p>Every lesson unlocks new games that turn review into play.</p></div>',
-  );
-  buffer.writeln('    <div class="tags">');
+  // Arcade Section
+  buffer.writeln('  <div class="fun-zone">');
+  buffer.writeln('    <div class="fun-zone-text">');
+  buffer.writeln('      <h3>🕹️ Learning Arcade</h3>');
+  buffer.writeln('      <p>Reinforcing concepts through gamified play.</p>');
+  buffer.writeln('    </div>');
+  buffer.writeln('    <div class="game-container">');
   for (final game in journeyData.games) {
-    buffer.writeln('      <span class="tag">${game.title}</span>');
+    buffer.writeln('      <div class="game-pill">${game.title} <span>${game.type.replaceAll("_", " ")}</span></div>');
   }
   buffer.writeln('    </div>');
   buffer.writeln('  </div>');
 
-  buffer.writeln('  <div class="footer">');
-  buffer.writeln(
-    '    <span><span class="brand">GNPS Learning Hub</span> · Curriculum Overview</span>',
-  );
-  buffer.writeln(
-    '    <span>Generated ${DateTime.now().year} · v${journeyData.version}</span>',
-  );
+  buffer.writeln('  <div class="footer-meta">');
+  buffer.writeln('    <span>Generated: ${DateTime.now().toString().split(' ')[0]}</span>');
+  buffer.writeln('    <span>GNPS Learning Hub • Content v${journeyData.version}</span>');
+  buffer.writeln('    <span>www.gnps.edu.in</span>');
   buffer.writeln('  </div>');
+  
+  buffer.writeln('</div>'); // End content
 
-  buffer.writeln('</div>'); // end body-wrap
-  buffer.writeln('</div>'); // end page
   buffer.writeln('</body></html>');
 
-  final htmlFile = File('curriculum_modern_temp.html');
+  final htmlFile = File('curriculum_modern_v2_temp.html');
   await htmlFile.writeAsString(buffer.toString());
-
-  final outFile = File('GNPS_Modern_Curriculum.pdf').absolute.path;
-  final htmlUri = Uri.file(htmlFile.absolute.path).toString();
-
-  final result = await Process.run(chromiumPath, [
+  
+  final result = await Process.run('libreoffice', [
     '--headless',
-    '--disable-gpu',
-    '--no-sandbox',
-    '--print-to-pdf=$outFile',
-    '--print-to-pdf-no-header',
-    '--no-margins',
-    '--virtual-time-budget=5000', // give web fonts/gradients time to load
-    htmlUri,
+    '--convert-to',
+    'pdf',
+    'curriculum_modern_v2_temp.html',
+    '--outdir',
+    '.',
   ]);
 
-  if (result.exitCode == 0 && await File(outFile).exists()) {
-    print('✅ Modern 1-Page PDF generated: GNPS_Modern_Curriculum.pdf');
+  if (result.exitCode == 0) {
+    final pdfFile = File('curriculum_modern_v2_temp.pdf');
+    if (await pdfFile.exists()) {
+      await pdfFile.rename('GNPS_Curriculum_Brochure_Premium.pdf');
+      print('✅ Premium 1-Page Brochure generated: GNPS_Curriculum_Brochure_Premium.pdf');
+    }
   } else {
-    print(
-      '❌ Chromium conversion failed (exit ${result.exitCode}): ${result.stderr}',
-    );
-    print('   If "chromium" isn\'t on PATH, run with:');
-    print(
-      '   dart run --define=CHROMIUM_PATH=/path/to/chrome tool/marketing_generator.dart',
-    );
+    print('❌ LibreOffice conversion failed: ${result.stderr}');
   }
 
   if (await htmlFile.exists()) await htmlFile.delete();
